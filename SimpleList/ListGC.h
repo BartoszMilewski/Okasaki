@@ -81,8 +81,6 @@ U foldr(F f, U acc, List<T> lst)
 		return f(lst.head(), foldr(f, acc, lst.tail()));
 }
 
-
-
 template<class T, class U, class F>
 // requires Convertible<F, U(U, T)>
 U foldl(F f, U acc, List<T> lst)

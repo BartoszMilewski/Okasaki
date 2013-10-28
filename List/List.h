@@ -89,6 +89,16 @@ U foldl(F f, U acc, List<T> lst)
 		return foldl(f, f(acc, lst.head()), lst.tail());
 }
 
+template<class T, class U, class F>
+// requires Convertible<F, U(T, U)>
+U foldr(F f, U acc, List<T> lst)
+{
+	if (lst.isEmpty())
+		return acc;
+	else
+		return f(lst.head(), foldr(f, acc, lst.tail()));
+}
+
 template<class T>
 void print(List<T> lst)
 {
