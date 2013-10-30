@@ -50,6 +50,10 @@ void testHigher()
 		return str + c;
 	}, std::string(), lst2);
 	std::cout << result2 << std::endl;
+
+	std::string mix = "TooMuchInformation";
+	auto lst3 = filter(isupper, fromIt(mix.begin(), mix.end()));
+	print(lst3);
 }
 
 void testLst()

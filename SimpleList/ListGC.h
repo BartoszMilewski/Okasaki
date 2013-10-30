@@ -71,6 +71,17 @@ List<U> fmap(F f, List<T> lst)
 		return List<U>(f(lst.head()), fmap<U>(f, lst.tail()));
 }
 
+template<class T, class P>
+List<T> filter(P p, List<T> lst)
+{
+	if (lst.isEmpty())
+		return List<T>();
+	if (p(lst.head()))
+		return List<T>(lst.head(), filter(p, lst.tail()));
+	else
+		return filter(p, lst.tail());
+}
+
 template<class T, class U, class F>
 // requires Convertible<F, U(T, U)>
 U foldr(F f, U acc, List<T> lst)
