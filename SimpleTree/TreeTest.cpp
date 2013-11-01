@@ -27,5 +27,9 @@ void testHigher()
 
 void main()
 {
+	auto t = Tree<int>().insert(2).insert(4).insert(3).insert(5).insert(6).insert(1);
+	std::cout << "Is member 1? " << t.member(1) << std::endl;
+	std::cout << "Is member 10? " << t.member(10) << std::endl;
+
 	testHigher();
 }

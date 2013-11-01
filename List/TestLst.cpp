@@ -1,5 +1,6 @@
 #include "List.h"
 #include <iostream>
+#include <string>
 
 List<char> test1()
 {
@@ -37,8 +38,31 @@ void testLst()
 	print(lst);
 }
 
+void testHigher()
+{
+	std::string str = "abcd";
+	auto lst = fromIt(str.begin(), str.end());
+	auto lst2 = fmap<char>(toupper, lst);
+	print(lst2);
+	auto result = foldr([](char c, std::string str)
+	{
+		return str + c;
+	}, std::string(), lst2);
+	std::cout << result << std::endl;
+	auto result2 = foldl([](std::string str, char c)
+	{
+		return str + c;
+	}, std::string(), lst2);
+	std::cout << result2 << std::endl;
+
+	std::string mix = "TooMuchInformation";
+	auto lst3 = filter(isupper, fromIt(mix.begin(), mix.end()));
+	print(lst3);
+}
+
 void main()
 {
 	testLst();
+	testHigher();
 }
 

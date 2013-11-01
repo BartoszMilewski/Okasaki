@@ -1,5 +1,4 @@
 #include "ListGC.h"
-//#include "List.h"
 #include <iostream>
 #include <string>
 #include <iterator>

@@ -40,10 +40,12 @@ public:
 		if (isEmpty())
 			return false;
 		T y = root();
-		if (x > y)
+		if (x < y)
 			return left().member(x);
-		else
+		else if (y < x)
 			return right().member(x);
+		else
+			return true;
 	}
 	Tree insert(T x) const
 	{
