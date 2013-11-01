@@ -57,6 +57,8 @@ void testHigher()
 
 void testLst()
 {
+	List<int> lst1{ 1, 2, 3, 4, 5, 6, 7 };
+	print(lst1);
 	auto lst = test2();
 	print(lst);
 }

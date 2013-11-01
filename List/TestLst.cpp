@@ -62,6 +62,10 @@ void testHigher()
 
 void main()
 {
+	{
+		List<int> lst1{ 10, 20, 30, 40, 50 };
+		print(lst1);
+	}
 	testLst();
 	testHigher();
 }

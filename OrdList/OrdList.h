@@ -1,5 +1,6 @@
 #include <cassert>
 #include <memory>
+#include <initializer_list>
 
 template<class T>
 // requires Ord<T>

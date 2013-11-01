@@ -13,8 +13,16 @@ void print(RBTree<T> const & t)
 	std::cout << std::endl;
 }
 
+void testInit()
+{
+	RBTree<int> t{ 50, 40, 30, 10, 20, 30, 100, 0, 45, 55, 25, 15 };
+	print(t);
+}
+
+
 void main()
 {
+	testInit();
 	std::string init =  "a red black tree walks into a bar "
 						"has johnny walker on the rocks "
 						"and quickly rebalances itself."

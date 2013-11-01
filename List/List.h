@@ -1,6 +1,7 @@
 #include <cassert>
 #include <memory>
 #include <functional>
+#include <initializer_list>
 #include <iostream> // debugging
 
 template<class T>
@@ -21,7 +22,14 @@ public:
 	List() {}
 	// Cons
 	List(T v, List const & tail) : _head(std::make_shared<Item>(v, tail._head)) {}
-	// Optionally, use initializer list
+	// From initializer list
+	List(std::initializer_list<T> init)
+	{
+		for (auto it = std::rbegin(init); it != std::rend(init); ++it)
+		{
+			_head = std::make_shared<Item>(*it, _head);
+		}
+	}
 
 	bool isEmpty() const { return !_head; } // conversion to bool
 	T head() const

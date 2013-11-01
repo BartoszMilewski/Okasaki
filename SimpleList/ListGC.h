@@ -1,6 +1,7 @@
 #include <cassert>
 #include <functional>
 #include <iostream>
+#include <initializer_list>
 
 // Imagine garbage collection
 
@@ -20,7 +21,14 @@ public:
     List() : _head(nullptr) {}
     // Cons
     List(T v, List tail) : _head(new Item(v, tail._head)) {}
-    // Optionally, use initializer list
+    // From initializer list
+	List(std::initializer_list<T> init) : _head(nullptr)
+	{
+		for (auto it = std::rbegin(init); it != std::rend(init); ++it)
+		{
+			_head = new Item(*it, _head);
+		}
+	}
 
     bool isEmpty() const { return !_head; }
     T head() const

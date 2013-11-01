@@ -1,5 +1,6 @@
 #include <cassert>
 #include <memory>
+#include <initializer_list>
 
 enum Color { R, B };
 
@@ -34,6 +35,15 @@ public:
 	RBTree(Color c, RBTree const & lft, T val, RBTree const & rgt)
 		: _root(std::make_shared<const Node>(c, lft._root, val, rgt._root))
 	{}
+	RBTree(std::initializer_list<T> init)
+	{
+		RBTree t;
+		for (T v : init)
+		{
+			t = t.insert(v);
+		}
+		_root = t._root;
+	}
 	bool isEmpty() const { return !_root; }
 	T root() const
 	{
@@ -134,7 +144,6 @@ private:
 		else
 			return RBTree(c, lft, x, rgt);
 	}
-	// (T R (T R a x b) y c)
 	bool doubledLeft() const 
 	{
 		return !isEmpty()
