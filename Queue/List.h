@@ -128,6 +128,16 @@ void forEach(List<T> lst, F f)
     }
 }
 
+template<class T>
+List<T> reverse(List<T> const & lst)
+{
+	return foldl([](List<T> const & acc, T v)
+	{
+		return List<T>(v, acc);
+	}, List<T>(), lst);
+}
+
+
 template<class Beg, class End>
 auto fromIt(Beg it, End end) -> List<typename Beg::value_type>
 {
@@ -149,13 +159,4 @@ void print(List<T> lst)
 		std::cout << "(" << lst.head() << ", " << lst.headCount() - 1 << ") ";
 		print(lst.tail());
 	}
-}
-
-template<class T>
-List<T> reverse(List<T> const & lst)
-{
-	return foldl([](List<T> const & acc, T v)
-	{
-		return List<T>(v, acc);
-	}, List<T>(), lst);
 }

@@ -1,5 +1,6 @@
 #include <memory>
 #include <cassert>
+#include <initializer_list>
 
 template<class T>
 class Tree
@@ -19,6 +20,15 @@ public:
 	Tree(Tree const & lft, T val, Tree const & rgt)
 		: _root(std::make_shared<const Node>(lft._root, val, rgt._root))
 	{}
+	Tree(std::initializer_list<T> init)
+	{
+		Tree t;
+		for (T v: init)
+		{
+			t = t.insert(v);
+		}
+		_root = t._root;
+	}
 	bool isEmpty() const { return !_root; }
 	T root() const
 	{
