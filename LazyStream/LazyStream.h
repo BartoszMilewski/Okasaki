@@ -4,26 +4,23 @@
 #include <mutex>
 
 template<class T>
-using FutPtr = std::function<std::unique_ptr<T>()>;
-
-template<class T>
 class Susp
 {
 public:
 	Susp(std::function<std::unique_ptr<T>()> const & f)
 		: _f(f)
 	{}
-	T * force()
+	T const & force()
 	{
 		// There probably is a better, lock-free, 
-		// implememntation of a singleton
-		std::lock_guard lck(_mtx);
+		// implememntation of this singleton
+		std::lock_guard<std::mutex> lck(_mtx);
 		if (!_memo)
 			_memo = _f();
-		return _memo;
+		return *_memo;
 	}
 private:
-	std::unique_ptr<T> * _memo;
+	std::unique_ptr<T> mutable _memo;
 	std::function<std::unique_ptr<T>()> _f;
 	std::mutex _mtx;
 };
@@ -40,23 +37,24 @@ class Cell
 	class Item
 	{
 	public:
-		Item(T v, std::shared_ptr<const Stream<T>> const & tail)
+		Item(T v, Stream<T> const & tail)
 			: _v(v), _tail(tail)
 		{}
 		T val() const { return _v; }
-		std::shared_ptr<const Stream<T>> tail() const { return _tail; }
+		Stream<T> tail() const { return _tail; }
 	private:
 		T _v;
-		std::shared_ptr<const Stream<T>> _tail;
+		Stream<T> _tail;
 	};
 public:
 	Cell() {}
-	Cell(T v, std::shared_ptr<const Stream<T>> const & tail)
+	Cell(T v, Stream<T> const & tail)
 		: _item(new Item(v, tail))
 	{}
+	Cell(const Cell &) = delete;
 	bool isEmpty() const { return !_item; }
 	T val() const { return _item->val(); }
-	std::shared_ptr<const Stream<T>> tail() const { return _item->tail(); }
+	Stream<T> tail() const { return _item->tail(); }
 private:
 	std::unique_ptr<const Item> _item;
 };
@@ -64,53 +62,69 @@ private:
 template<class T>
 using FutCell = std::function<std::unique_ptr<const Cell<T>>()>;
 
-// Streams are to be shared
+// Streams are ref-counted
 // Stream contains (lazy) Cell
 template<class T>
 class Stream
 {
 public:
+	Stream() = delete;
 	Stream(FutCell<T> f)
-		: _futCell(f)
+		: _lazyCell(std::make_shared<Susp<const Cell<T>>>(f))
 	{}
 	bool isEmpty() const
 	{
-		return force().isEmpty();
+		return _lazyCell->force().isEmpty();
 	}
 	T get() const
 	{
-		return force().val();
+		return _lazyCell->force().val();
 	}
-	std::shared_ptr<const Stream<T>> tail() const
+	Stream<T> tail() const
 	{
-		return force().tail();
+		return _lazyCell->force().tail();
 	}
 private:
-	Cell<T> const & force() const // not thread safe
-	{
-		if (!_memo)
-		{
-			std::unique_ptr<const Cell<T>> cell = _futCell();
-			// ((Stream<T> *) this)->
-			_memo = std::move(cell);
-		}
-		return *_memo;
-	}
-private:
-	std::unique_ptr<const Cell<T>>  mutable _memo;
-	FutCell<T>						_futCell;
+	std::shared_ptr < Susp<const Cell<T>>> _lazyCell;
 };
 
 template<class T>
-std::shared_ptr<const Stream<T>> concat( std::shared_ptr<const Stream<T>> const & lft
-										,std::shared_ptr<const Stream<T>> const & rgt)
+class CellGen
 {
-	if (lft->isEmpty())
-		return rgt;
-	return std::make_shared<const Stream<T>>([=]()
+public:
+	CellGen(T v, Stream<T> const & s) : _v(v), _s(s) {}
+
+	std::unique_ptr<Cell<T>> operator()()
 	{
-		T val = lft->get();
-		auto tail = lft->tail();
+		return std::unique_ptr<Cell<T>>(new Cell<T>(_v, _s));
+	}
+	T _v;
+	Stream<T> _s;
+};
+
+template<class T>
+class EmptyCellGen
+{
+public:
+	EmptyCellGen() {}
+	std::unique_ptr<Cell<T>> operator()()
+	{
+		return std::unique_ptr<Cell<T>>(new Cell<T>());
+	}
+};
+
+
+
+template<class T>
+Stream<T> concat(Stream<T> const & lft
+				,Stream<T> const & rgt)
+{
+	if (lft.isEmpty())
+		return rgt;
+	return Stream<T>([=]()
+	{
+		T val = lft.get();
+		auto tail = lft.tail();
 		return std::unique_ptr<const Cell<T>>(new Cell<T>(val, concat<T>(tail, rgt)));
 	});
 }

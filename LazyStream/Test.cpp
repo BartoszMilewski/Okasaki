@@ -1,42 +1,46 @@
 #include "LazyStream.h"
 #include <iostream>
 
-
-std::shared_ptr<const Stream<int>> mkStream()
+Stream<int> mkStream(int a, int b)
 {
-	auto s = std::make_shared<const Stream<int>> ([]()
-	{
-		return std::unique_ptr<Cell<int>>(new Cell<int>());
-	});
-	bool b = s->isEmpty();
+	//Stream<int> s([]()
+	//{
+	//	return std::unique_ptr<Cell<int>>(new Cell<int>());
+	//});
 
-	auto s1 = std::make_shared<const Stream<int>> ([=]()
-	{
-		return std::unique_ptr<Cell<int>>(new Cell<int>(13, s));
-	});
-	bool b1 = s1->isEmpty();
+	EmptyCellGen<int> e;
+	Stream<int> s(e);
 
-	int x = s1->get();
-	bool b3 = s1->tail()->isEmpty();
+	//Stream<int> s1([=]()
+	//{
+	//	return std::unique_ptr<Cell<int>>(new Cell<int>(13, s));
+	//});
 
-	auto s2 = std::make_shared<const Stream<int>>([=]()
-	{
-		return std::unique_ptr<Cell<int>>(new Cell<int>(14, s1));
-	});
+	Stream<int> s1(CellGen<int>(b, s));
+
+	// int x = s1.get();
+	// bool b3 = s1.tail().isEmpty();
+
+	//Stream<int> s2([=]()
+	//{
+	//	return std::unique_ptr<Cell<int>>(new Cell<int>(14, s1));
+	//});
+
+	Stream<int> s2(CellGen<int>(a, s1));
 	return s2;
 }
 
 template<class T>
-void forcePrint(std::shared_ptr<const Stream<T>> const & s)
+void forcePrint(Stream<T> const & s)
 {
-	if (s->isEmpty())
+	if (s.isEmpty())
 	{
 		std::cout << std::endl;
 	}
 	else
 	{
-		T v = s->get();
-		auto tail = s->tail();
+		T v = s.get();
+		auto tail = s.tail();
 		std::cout << v << " ";
 		forcePrint(tail);
 	}
@@ -44,7 +48,8 @@ void forcePrint(std::shared_ptr<const Stream<T>> const & s)
 
 void main()
 {
-	auto s = mkStream();
-	auto s1 = concat<int>(s, s);
-	forcePrint(s1);
+	auto s1 = mkStream(5, 10);
+	auto s2 = mkStream(15, 20);
+	auto s = concat<int>(s1, s2);
+	forcePrint(s);
 }
