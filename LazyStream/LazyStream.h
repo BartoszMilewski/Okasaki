@@ -10,7 +10,7 @@ public:
 	Susp(std::function<std::unique_ptr<T>()> const & f)
 		: _f(f)
 	{}
-	T const & force()
+	T const & force() const
 	{
 		// There probably is a better, lock-free, 
 		// implememntation of this singleton
@@ -19,10 +19,15 @@ public:
 			_memo = _f();
 		return *_memo;
 	}
+	bool isForced() const 
+	{
+		std::lock_guard<std::mutex> lck(_mtx);
+		return !!_memo;
+	}
 private:
 	std::unique_ptr<T> mutable _memo;
 	std::function<std::unique_ptr<T>()> _f;
-	std::mutex _mtx;
+	std::mutex mutable _mtx;
 };
 
 template<class T>
@@ -52,6 +57,7 @@ public:
 		: _item(new Item(v, tail))
 	{}
 	Cell(const Cell &) = delete;
+
 	bool isEmpty() const { return !_item; }
 	T val() const { return _item->val(); }
 	Stream<T> tail() const { return _item->tail(); }
@@ -68,13 +74,13 @@ template<class T>
 class Stream
 {
 public:
-	Stream() = delete;
+	Stream() {}
 	Stream(FutCell<T> f)
 		: _lazyCell(std::make_shared<Susp<const Cell<T>>>(f))
 	{}
 	bool isEmpty() const
 	{
-		return _lazyCell->force().isEmpty();
+		return !_lazyCell;
 	}
 	T get() const
 	{
@@ -84,15 +90,57 @@ public:
 	{
 		return _lazyCell->force().tail();
 	}
+	// for debugging only
+	bool isForced() const
+	{
+		return !isEmpty() && _lazyCell->isForced();
+	}
+	Stream take(int n) const
+	{
+		if (n == 0 || isEmpty())
+			return Stream();
+		auto v = get();
+		auto t = tail();
+		return Stream([=]()
+		{
+			return std::unique_ptr<Cell<T>>(new Cell<T>(v, t.take(n - 1)));
+		});
+	}
+	Stream drop(int n) const
+	{
+		if (n == 0)
+			return *this;
+		if (isEmpty())
+			return Stream();
+		auto t = tail();
+		return t.drop(n - 1);
+	}
+	Stream reverse() const
+	{
+		return rev(Stream());
+	}
+private:
+	Stream rev(Stream acc) const
+	{
+		if (isEmpty())
+			return acc;
+		auto v = get();
+		auto t = tail();
+		Stream nextAcc([=]
+		{
+			return std::unique_ptr<Cell<T>>(new Cell<T>(v, acc));
+		});
+		return t.rev(nextAcc);
+	}
 private:
 	std::shared_ptr < Susp<const Cell<T>>> _lazyCell;
 };
 
 template<class T>
-class CellGen
+class CellFun
 {
 public:
-	CellGen(T v, Stream<T> const & s) : _v(v), _s(s) {}
+	CellFun(T v, Stream<T> const & s) : _v(v), _s(s) {}
 
 	std::unique_ptr<Cell<T>> operator()()
 	{
@@ -101,19 +149,6 @@ public:
 	T _v;
 	Stream<T> _s;
 };
-
-template<class T>
-class EmptyCellGen
-{
-public:
-	EmptyCellGen() {}
-	std::unique_ptr<Cell<T>> operator()()
-	{
-		return std::unique_ptr<Cell<T>>(new Cell<T>());
-	}
-};
-
-
 
 template<class T>
 Stream<T> concat(Stream<T> const & lft
