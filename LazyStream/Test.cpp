@@ -3,29 +3,9 @@
 
 Stream<int> mkStream(int a, int b)
 {
-	//Stream<int> s([]()
-	//{
-	//	return std::unique_ptr<Cell<int>>(new Cell<int>());
-	//});
-
-	Stream<int> s;
-
-	//Stream<int> s1([=]()
-	//{
-	//	return std::unique_ptr<Cell<int>>(new Cell<int>(13, s));
-	//});
-
-	Stream<int> s1(CellFun<int>(b, s));
-
-	// int x = s1.get();
-	// bool b3 = s1.tail().isEmpty();
-
-	//Stream<int> s2([=]()
-	//{
-	//	return std::unique_ptr<Cell<int>>(new Cell<int>(14, s1));
-	//});
-
-	Stream<int> s2(CellFun<int>(a, s1));
+	Stream<int> s0;
+	Stream<int> s1(b, s0);
+	Stream<int> s2(a, s1);
 	return s2;
 }
 

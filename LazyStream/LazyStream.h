@@ -68,6 +68,20 @@ private:
 template<class T>
 using FutCell = std::function<std::unique_ptr<const Cell<T>>()>;
 
+template<class T>
+class CellFun
+{
+public:
+	CellFun(T v, Stream<T> const & s) : _v(v), _s(s) {}
+
+	std::unique_ptr<Cell<T>> operator()()
+	{
+		return std::unique_ptr<Cell<T>>(new Cell<T>(_v, _s));
+	}
+	T _v;
+	Stream<T> _s;
+};
+
 // Streams are ref-counted
 // Stream contains (lazy) Cell
 template<class T>
@@ -75,6 +89,11 @@ class Stream
 {
 public:
 	Stream() {}
+	Stream(T v, Stream const & s)
+	{
+		FutCell<T> f = CellFun<T>(v, s);
+		_lazyCell = std::make_shared<Susp<const Cell<T>>>(f);
+	}
 	Stream(FutCell<T> f)
 		: _lazyCell(std::make_shared<Susp<const Cell<T>>>(f))
 	{}
@@ -136,19 +155,6 @@ private:
 	std::shared_ptr < Susp<const Cell<T>>> _lazyCell;
 };
 
-template<class T>
-class CellFun
-{
-public:
-	CellFun(T v, Stream<T> const & s) : _v(v), _s(s) {}
-
-	std::unique_ptr<Cell<T>> operator()()
-	{
-		return std::unique_ptr<Cell<T>>(new Cell<T>(_v, _s));
-	}
-	T _v;
-	Stream<T> _s;
-};
 
 template<class T>
 Stream<T> concat(Stream<T> const & lft

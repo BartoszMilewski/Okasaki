@@ -11,7 +11,7 @@ public:
 	bool isEmpty() const { return _lenF == 0; }
 	Queue push_back(T x) const
 	{
-		return check(_lenF, _front, _lenR + 1, Stream<T>(CellFun<T>(x, _rear)));
+		return check(_lenF, _front, _lenR + 1, Stream<T>(x, _rear));
 	}
 	T front() const { return _front.get(); }
 	
