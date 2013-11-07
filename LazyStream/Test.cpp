@@ -19,7 +19,7 @@ void forcePrint(Stream<T> const & s)
 	else
 	{
 		T v = s.get();
-		auto tail = s.tail();
+		auto tail = s.pop_front();
 		std::cout << v << " ";
 		forcePrint(tail);
 	}
@@ -35,7 +35,7 @@ void lazyPrint(Stream<T> const & s)
 	else if (s.isForced())
 	{
 		T v = s.get();
-		auto tail = s.tail();
+		auto tail = s.pop_front();
 		std::cout << v << " ";
 		lazyPrint(tail);
 	}
@@ -54,7 +54,7 @@ void main()
 	lazyPrint(s);
 	int x = s.get();
 	lazyPrint(s);
-	auto tail = s.tail();
+	auto tail = s.pop_front();
 	lazyPrint(s);
 	int y = tail.get();
 	lazyPrint(s);

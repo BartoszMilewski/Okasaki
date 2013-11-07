@@ -16,12 +16,12 @@ public:
 	T front()
 	{
 		assert(!isEmpty());
-		return _front.head();
+		return _front.front();
 	}
-	Queue tail()
+	Queue pop_front()
 	{
 		assert(!isEmpty());
-		return check(_front.tail(), _rear);
+		return check(_front.pop_front(), _rear);
 	}
 	Queue push_back(T v)
 	{

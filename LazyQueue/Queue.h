@@ -17,7 +17,7 @@ public:
 	
 	Queue pop_front() const
 	{
-		return check(_lenF - 1, _front.tail(), _lenR, _rear);
+		return check(_lenF - 1, _front.pop_front(), _lenR, _rear);
 	}
 	// for debugging only
 	int lenF() const { return _lenF; }

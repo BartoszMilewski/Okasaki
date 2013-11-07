@@ -20,15 +20,15 @@ public:
 	// Cons
 	OrdList(T v, OrdList const & tail) : _head(std::make_shared<Item>(v, tail._head))
 	{
-		assert(tail.isEmpty() || v <= tail.head());
+		assert(tail.isEmpty() || v <= tail.front());
 	}
 	bool isEmpty() const { return !_head; } // conversion to bool
-	T head() const
+	T front() const
 	{
 		assert(!isEmpty());
 		return _head->_val;
 	}
-	OrdList tail() const
+	OrdList pop_front() const
 	{
 		assert(!isEmpty());
 		return OrdList(_head->_next);
@@ -36,10 +36,10 @@ public:
 	// Additional utilities
 	OrdList insert(T v) const
 	{
-		if (isEmpty() || v <= head())
+		if (isEmpty() || v <= front())
 			return OrdList(v, OrdList(_head));
 		else {
-			return OrdList<T>(head(), tail().insert(v));
+			return OrdList<T>(front(), pop_front().insert(v));
 		}
 	}
 	// For debugging
@@ -56,10 +56,10 @@ OrdList<T> merge(OrdList<T> const & a, OrdList<T> const & b)
 		return b;
 	if (b.isEmpty())
 		return a;
-	if (a.head() <= b.head())
-		return OrdList<T>(a.head(), merge(a.tail(), b));
+	if (a.front() <= b.front())
+		return OrdList<T>(a.front(), merge(a.pop_front(), b));
 	else
-		return OrdList<T>(b.head(), merge(a, b.tail()));
+		return OrdList<T>(b.front(), merge(a, b.pop_front()));
 }
 
 // For debugging
@@ -70,7 +70,7 @@ void print(OrdList<T> lst)
 		std::cout << std::endl;
 	}
 	else {
-		std::cout << "(" << lst.head() << ", " << lst.headCount() - 1 << ") ";
-		print(lst.tail());
+		std::cout << "(" << lst.front() << ", " << lst.headCount() - 1 << ") ";
+		print(lst.pop_front());
 	}
 }

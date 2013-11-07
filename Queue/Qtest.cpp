@@ -14,13 +14,13 @@ void test()
 	q3.printq();
 	std::cout << "--Popping\n\n";
 	std::cout << "pop " << q3.front() << std::endl;
-	auto q4 = q3.tail();
+	auto q4 = q3.pop_front();
 	q4.printq();
 	std::cout << "pop " << q4.front() << std::endl;
-	auto q5 = q4.tail();
+	auto q5 = q4.pop_front();
 	q5.printq();
 	std::cout << "pop " << q5.front() << std::endl;
-	auto q6 = q5.tail();
+	auto q6 = q5.pop_front();
 	q6.printq();
 }
 

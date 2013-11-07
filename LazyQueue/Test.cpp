@@ -11,7 +11,7 @@ void lazyPrint(Stream<T> const & s)
 	else if (s.isForced())
 	{
 		T v = s.get();
-		auto tail = s.tail();
+		auto tail = s.pop_front();
 		std::cout << v << " ";
 		lazyPrint(tail);
 	}

@@ -32,12 +32,12 @@ public:
 	}
 
 	bool isEmpty() const { return !_head; } // conversion to bool
-	T head() const
+	T front() const
 	{
 		assert(!isEmpty());
 		return _head->_val;
 	}
-	List tail() const
+	List pop_front() const
 	{
 		assert(!isEmpty());
 		return List(_head->_next);
@@ -53,7 +53,7 @@ public:
 			return prepend(v);
 		else {
 			assert(!isEmpty());
-			return List<T>(head(), tail().insertAt(i - 1, v));
+			return List<T>(front(), pop_front().insertAt(i - 1, v));
 		}
 	}
 	// For debugging
@@ -68,7 +68,7 @@ List<T> concat(List<T> const & a, List<T> const & b)
 {
 	if (a.isEmpty())
 		return b;
-	return List<T>(a.head(), concat(a.tail(), b));
+	return List<T>(a.front(), concat(a.pop_front(), b));
 }
 
 template<class U, class T, class F>
@@ -79,7 +79,7 @@ List<U> fmap(F f, List<T> lst)
     if (lst.isEmpty()) 
         return List<U>();
     else
-        return List<U>(f(lst.head()), fmap<U>(f, lst.tail()));
+        return List<U>(f(lst.front()), fmap<U>(f, lst.pop_front()));
 }
 
 template<class T, class P>
@@ -89,10 +89,10 @@ List<T> filter(P p, List<T> lst)
                  "filter requires a function type bool(T)");
     if (lst.isEmpty())
         return List<T>();
-    if (p(lst.head()))
-        return List<T>(lst.head(), filter(p, lst.tail()));
+    if (p(lst.front()))
+        return List<T>(lst.front(), filter(p, lst.pop_front()));
     else
-        return filter(p, lst.tail());
+        return filter(p, lst.pop_front());
 }
 
 template<class T, class U, class F>
@@ -103,7 +103,7 @@ U foldr(F f, U acc, List<T> lst)
     if (lst.isEmpty())
         return acc;
     else
-        return f(lst.head(), foldr(f, acc, lst.tail()));
+        return f(lst.front(), foldr(f, acc, lst.pop_front()));
 }
 
 template<class T, class U, class F>
@@ -114,7 +114,7 @@ U foldl(F f, U acc, List<T> lst)
     if (lst.isEmpty())
         return acc;
     else
-        return foldl(f, f(acc, lst.head()), lst.tail());
+        return foldl(f, f(acc, lst.front()), lst.pop_front());
 }
 
 template<class T, class F>
@@ -123,8 +123,8 @@ void forEach(List<T> lst, F f)
     static_assert(std::is_convertible<F, std::function<void(T)>>::value, 
                  "forEach requires a function type void(T)");
     if (!lst.isEmpty()) {
-        f(lst.head());
-        forEach(lst.tail(), f);
+        f(lst.front());
+        forEach(lst.pop_front(), f);
     }
 }
 
@@ -156,7 +156,7 @@ void print(List<T> lst)
 		std::cout << std::endl;
 	}
 	else {
-		std::cout << "(" << lst.head() << ", " << lst.headCount() - 1 << ") ";
-		print(lst.tail());
+		std::cout << "(" << lst.front() << ", " << lst.headCount() - 1 << ") ";
+		print(lst.pop_front());
 	}
 }

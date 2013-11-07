@@ -5,10 +5,10 @@
 List<char> test1()
 {
 	List<char> lst0;
-	auto lst1 = lst0.prepend('a');
+	auto lst1 = lst0.push_front('a');
 	// a: ref 1
 	print(lst1);
-	auto lst2 = lst1.prepend('b');
+	auto lst2 = lst1.push_front('b');
 	// b: ref 1
 	// a: ref 2
 	print(lst2);
