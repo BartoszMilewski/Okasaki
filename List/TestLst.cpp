@@ -1,6 +1,7 @@
 #include "List.h"
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 List<char> test1()
 {
@@ -64,6 +65,18 @@ void main()
 {
 	{
 		List<int> lst1{ 10, 20, 30, 40, 50 };
+
+		for (int x : lst1)
+			std::cout << x << " ";
+		std::cout << std::endl;
+
+		OutListIter<int> out;
+		auto it = std::transform(std::begin(lst1), std::end(lst1), out, [](int i)
+		{
+			return ++i;
+		});
+		print(it.getList());
+
 		print(lst1);
 		auto lst2 = reverse(lst1);
 		print(lst2);
