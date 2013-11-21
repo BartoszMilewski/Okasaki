@@ -19,7 +19,10 @@ public:
 	Tree() {}
 	Tree(Tree const & lft, T val, Tree const & rgt)
 		: _root(std::make_shared<const Node>(lft._root, val, rgt._root))
-	{}
+	{
+		assert(lft.isEmpty() || lft.root() < val);
+		assert(rgt.isEmpty() || val < rgt.root());
+	}
 	Tree(std::initializer_list<T> init)
 	{
 		Tree t;
