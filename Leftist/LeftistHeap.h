@@ -8,29 +8,22 @@ private:
     struct Tree
     {
         Tree(T v) : _rank(1), _v(v) {}
-        Tree(int rank, T v, Heap<T> const & left,Heap<T> const & right)
+        Tree(int rank
+            , T v
+            , std::shared_ptr<const Tree> const & left
+            , std::shared_ptr<const Tree> const & right)
         : _rank(rank), _v(v), _left(left), _right(right)
         {}
 
         int _rank;
         T   _v;
-        Heap<T> _left;
-        Heap<T> _right;
+        std::shared_ptr<const Tree> _left;
+        std::shared_ptr<const Tree> _right;
     };
-    std::shared_ptr<Tree> _tree;
+    std::shared_ptr<const Tree> _tree;
 private:
-    Heap<T> & left() const { return _tree->_left; }
-    Heap<T> & right() const { return _tree->_right; }
-    void assertInv() const 
-    { 
-        if (!isEmpty())
-        {
-            // left bias
-            assert(left().rank() >= right().rank());
-            left().assertInv();
-            right().assertInv();
-        }
-    }
+    explicit Heap(std::shared_ptr<const Tree> const & tree) 
+        : _tree(tree) {}
     Heap(T x, Heap const & a, Heap const & b)
     {
         a.assertInv();
@@ -39,24 +32,52 @@ private:
         assert(b.isEmpty() || x <= b.front());
         // rank is the length of the right spine
         if (a.rank() >= b.rank())
-            _tree = std::make_shared<Tree>(b.rank() + 1, x, a, b);
+            _tree = std::make_shared<const Tree>(b.rank() + 1, x, a._tree, b._tree);
         else
-            _tree = std::make_shared<Tree>(a.rank() + 1, x, b, a);
+            _tree = std::make_shared<const Tree>(a.rank() + 1, x, b._tree, a._tree);
         assertInv();
+    }
+    Heap<T>  left() const
+    {
+        assert(!isEmpty());
+        return Heap(_tree->_left);
+    }
+    Heap<T> right() const
+    {
+        assert(!isEmpty());
+        return Heap(_tree->_right);
+    }
+    void assertInv() const
+    {
+        if (!isEmpty())
+        {
+            // left bias
+            assert(left().rank() >= right().rank());
+            left().assertInv();
+            right().assertInv();
+        }
     }
 public:
     Heap() {}
-    Heap(T x) : _tree(std::make_shared<Tree>(x))
+    explicit Heap(T x) : _tree(std::make_shared<const Tree>(x))
     {}
     Heap(std::initializer_list<T> init)
     {
-        Heap h;
-        for (T v : init)
-        {
-            h = h.insert(v);
-        }
-        _tree = h._tree;
+        _tree = heapify(init.begin(), init.end())._tree;
         assertInv();
+    }
+    template<class Iter>
+    static Heap heapify(Iter b, Iter e)
+    {
+        if (b == e)
+            return Heap();
+        if (e - b == 1)
+            return Heap(*b);
+        else
+        {
+            Iter mid = b + (e - b) / 2;
+            return merge(heapify(b, mid), heapify(mid, e));
+        }
     }
     bool isEmpty() const { return !_tree; }
     int rank() const
