@@ -8,11 +8,11 @@ List<char> test1()
 	List<char> lst0;
 	auto lst1 = lst0.push_front('a');
 	// a: ref 1
-	print(lst1);
+    std::cout << lst1 << std::endl;
 	auto lst2 = lst1.push_front('b');
 	// b: ref 1
 	// a: ref 2
-	print(lst2);
+    std::cout << lst2 << std::endl;
 	return lst2;
     // lst1 is deleted decrementing ref count on a
 }
@@ -22,21 +22,21 @@ List<char> test2()
 	auto lst3 = test1(); // {b, a}
 	// b: ref 1
 	// a: ref 1
-	print(lst3);
+    std::cout << lst3 << std::endl;
 	auto lst4 = lst3.insertAt(1, 'x'); // {b, x, a}
 	// x: ref 1
 	// b: ref 2
 	// a: ref 1
-	print (lst4);
+    std::cout << lst4 << std::endl;
 	auto lst5 = concat(lst3, lst4);
-	print(lst5);
+    std::cout << lst5 << std::endl;
 	return lst5;
 }
 
 void testLst()
 {
 	auto lst = test2();
-	print(lst);
+    std::cout << lst << std::endl;
 }
 
 void testHigher()
@@ -44,7 +44,7 @@ void testHigher()
 	std::string str = "abcd";
 	auto lst = fromIt(str.begin(), str.end());
 	auto lst2 = fmap<char>(toupper, lst);
-	print(lst2);
+    std::cout << lst2 << std::endl;
 	auto result = foldr([](char c, std::string str)
 	{
 		return str + c;
@@ -58,7 +58,7 @@ void testHigher()
 
 	std::string mix = "TooMuchInformation";
 	auto lst3 = filter(isupper, fromIt(mix.begin(), mix.end()));
-	print(lst3);
+    std::cout << lst3 << std::endl;
 }
 
 void main()
@@ -75,11 +75,11 @@ void main()
 		{
 			return ++i;
 		});
-		print(it.getList());
+        std::cout << it.getList() << std::endl;
 
-		print(lst1);
+        std::cout << lst1 << std::endl;
 		auto lst2 = reverse(lst1);
-		print(lst2);
+        std::cout << lst2 << std::endl;
 	}
 	testLst();
 	testHigher();

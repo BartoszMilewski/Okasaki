@@ -3,7 +3,7 @@
 #include <functional>
 #include <initializer_list>
 #include <iterator>
-#include <iostream> // debugging
+#include <iostream> // print
 
 template<class T> class FwdListIter;
 
@@ -13,8 +13,8 @@ class List
     struct Item
     {
         Item(T v, std::shared_ptr<const Item> const & tail) : _val(v), _next(tail) {}
-        // For debugging only
-        ~Item() { std::cout << "! " << _val << std::endl; }
+        // singleton
+        explicit Item(T v) : _val(v) {}
         T _val;
         std::shared_ptr<const Item> _next;
     };
@@ -25,6 +25,8 @@ public:
     List() {}
     // Cons
     List(T v, List const & tail) : _head(std::make_shared<Item>(v, tail._head)) {}
+    // Singleton
+    explicit List(T v) : _head(std::make_shared<Item>(v)) {}
     // From initializer list
     List(std::initializer_list<T> init)
     {
@@ -50,6 +52,11 @@ public:
     {
         return List(v, *this);
     }
+    List take(int n)
+    {
+        if (n <= 0 || isEmpty()) return List();
+        return pop_front().take(n - 1).push_front(front());
+    }
     List insertAt(int i, T v) const
     {
         if (i == 0)
@@ -58,6 +65,19 @@ public:
             assert(!isEmpty());
             return List<T>(front(), pop_front().insertAt(i - 1, v));
         }
+    }
+    List remove(T v) const
+    {
+        if (isEmpty()) return List();
+        if (v == front())
+            return pop_front().remove(v);
+        return List(front(), pop_front().remove(v));
+    }
+    bool member(T v) const
+    {
+        if (isEmpty()) return false;
+        if (v == front()) return true;
+        return pop_front().member(v);
     }
 	
 	friend class FwdListIter<T>;
@@ -179,6 +199,35 @@ U foldl(F f, U acc, List<T> lst)
         return foldl(f, f(acc, lst.front()), lst.pop_front());
 }
 
+// Set difference a \ b
+template<class T>
+List<T> diff(List<T> const & as, List<T> const & bs)
+{
+    return foldl([](List<T> const & acc, T x) {
+        return acc.remove(x);
+    }, as, bs);
+}
+
+// Set union of two lists, xs u ys
+// Assume no duplicates inside either list
+template<class T>
+List<T> unionize(List<T> const & xs, List<T> const & ys)
+{
+    // xs u ys = (ys \ xs) ++ xs
+    // remove all xs from ys
+    auto trimmed = foldl([](List<T> const & acc, T x) {
+        return acc.remove(x);
+    }, ys, xs);
+    return concat(trimmed, xs);
+}
+
+template<class T>
+List<T> concatAll(List<List<T>> const & xss)
+{
+    if (xss.isEmpty()) return List<T>();
+    return concat(xss.front(), concatAll(xss.pop_front()));
+}
+
 template<class T, class F>
 void forEach(List<T> lst, F f) 
 {
@@ -200,6 +249,14 @@ auto fromIt(Beg it, End end) -> List<typename Beg::value_type>
     return List<T>(item, fromIt(++it, end));
 }
 
+template<class T, class F>
+List<T> iterateN(F f, T init, int count)
+{
+    if (count <= 0) return List<T>();
+    return iterateN(f, f(init), count - 1).push_front(init);
+}
+
+/*
 // Pass lst by value not reference!
 template<class T>
 void print(List<T> lst)
@@ -211,6 +268,18 @@ void print(List<T> lst)
         std::cout << "(" << lst.front() << ", " << lst.headCount() - 1 << ") ";
         print(lst.pop_front());
     }
+}
+*/
+
+template<class T>
+std::ostream& operator<<(std::ostream& os, List<T> const & lst)
+{
+    os << "[";
+    forEach(lst, [&os](T v) {
+        os << v << " ";
+    });
+    os << "]";
+    return os;
 }
 
 template<class T>
