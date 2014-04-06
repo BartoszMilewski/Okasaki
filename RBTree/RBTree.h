@@ -1,8 +1,6 @@
 #include <cassert>
 #include <memory>
 
-enum Color { R, B };
-
 // 1. No red node has a red child.
 // 2. Every path from root to empty node contains the same
 // number of black nodes.
@@ -10,6 +8,8 @@ enum Color { R, B };
 template<class T>
 class RBTree
 {
+    enum Color { R, B };
+
     struct Node
     {
         Node(Color c, 
@@ -44,6 +44,15 @@ public:
         {
             t = t.insert(v);
         }
+        _root = t._root;
+    }
+    template<class I>
+    RBTree(I b, I e)
+    {
+        RBTree t;
+        for_each(b, e, [&t](T const & v){
+            t = t.insert(v);
+        });
         _root = t._root;
     }
     bool isEmpty() const { return !_root; }
@@ -199,6 +208,18 @@ RBTree<T> insert(RBTree<T> t, Beg it, End end)
     T item = *it;
     auto t1 = insert(t, ++it, end);
     return t1.insert(item);
+}
+
+template<class T>
+RBTree<T> treeUnion(RBTree<T> const & a, RBTree<T> const & b)
+{
+    // a u b = a + (b \ a)
+    RBTree<T> res = a;
+    forEach(b, [&res, &a](T const & v){
+        if (!a.member(v))
+            res.insert(v);
+    });
+    return res;
 }
 
 

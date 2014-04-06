@@ -15,6 +15,7 @@ class List
         Item(T v, std::shared_ptr<const Item> const & tail) : _val(v), _next(tail) {}
         // singleton
         explicit Item(T v) : _val(v) {}
+        //~Item() { std::cout << "~" << _val << std::endl; }
         T _val;
         std::shared_ptr<const Item> _next;
     };
@@ -23,6 +24,14 @@ class List
 public:
     // Empty list
     List() {}
+    List(List && lst)
+        : _head(std::move(lst._head))
+    {}
+    List & operator=(List && lst)
+    {
+        _head = std::move(lst._head);
+        return *this;
+    }
     // Cons
     List(T v, List const & tail) : _head(std::make_shared<Item>(v, tail._head)) {}
     // Singleton
@@ -73,11 +82,28 @@ public:
             return pop_front().remove(v);
         return List(front(), pop_front().remove(v));
     }
+    List remove1(T v) const
+    {
+        if (isEmpty()) return List();
+        if (v == front())
+            return pop_front();
+        return List(front(), pop_front().remove(v));
+    }
     bool member(T v) const
     {
         if (isEmpty()) return false;
         if (v == front()) return true;
         return pop_front().member(v);
+    }
+    template<class F>
+    void forEach(F f) const
+    {
+        Item const * it = _head.get();
+        while (it != nullptr)
+        {
+            f(it->_val);
+            it = it->_next.get();
+        }
     }
 	
 	friend class FwdListIter<T>;
@@ -228,14 +254,17 @@ List<T> concatAll(List<List<T>> const & xss)
     return concat(xss.front(), concatAll(xss.pop_front()));
 }
 
+// consumes the list when called: 
+// forEach(std::move(lst), f);
+
 template<class T, class F>
 void forEach(List<T> lst, F f) 
 {
     static_assert(std::is_convertible<F, std::function<void(T)>>::value, 
                  "forEach requires a function type void(T)");
-    if (!lst.isEmpty()) {
+    while (!lst.isEmpty()) {
         f(lst.front());
-        forEach(lst.pop_front(), f);
+        lst = lst.pop_front();
     }
 }
 
@@ -256,20 +285,18 @@ List<T> iterateN(F f, T init, int count)
     return iterateN(f, f(init), count - 1).push_front(init);
 }
 
-/*
 // Pass lst by value not reference!
 template<class T>
-void print(List<T> lst)
+void printRaw(List<T> lst)
 {
     if (lst.isEmpty()) {
         std::cout << std::endl;
     }
     else {
         std::cout << "(" << lst.front() << ", " << lst.headCount() - 1 << ") ";
-        print(lst.pop_front());
+        printRaw(lst.pop_front());
     }
 }
-*/
 
 template<class T>
 std::ostream& operator<<(std::ostream& os, List<T> const & lst)

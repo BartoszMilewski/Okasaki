@@ -61,8 +61,18 @@ void testHigher()
     std::cout << lst3 << std::endl;
 }
 
+void consume(List<int> lst);
+
 void main()
 {
+    List<int> lst = { 1, 2, 3 };
+    printRaw(lst);
+    // doesn't consume
+    consume(lst);
+    // consumes
+    consume(std::move(lst));
+    printRaw(lst);
+
 	{
 		List<int> lst1{ 10, 20, 30, 40, 50 };
 
@@ -83,5 +93,16 @@ void main()
 	}
 	testLst();
 	testHigher();
+}
+
+void consume(List<int> lst)
+{
+    printRaw(lst);
+    while (!lst.isEmpty())
+    {
+        std::cout << lst.front();
+        lst = lst.pop_front();
+    }
+    printRaw(lst);
 }
 

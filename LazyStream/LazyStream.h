@@ -73,7 +73,7 @@ class CellFun
 {
 public:
 	CellFun(T v, Stream<T> const & s) : _v(v), _s(s) {}
-
+    explicit CellFun(T v) : _v(v) {}
 	std::unique_ptr<Cell<T>> operator()()
 	{
 		return std::unique_ptr<Cell<T>>(new Cell<T>(_v, _s));
@@ -89,6 +89,11 @@ class Stream
 {
 public:
 	Stream() {}
+    explicit Stream(T v)
+    {
+        FutCell<T> f = CellFun<T>(v);
+        _lazyCell = std::make_shared<Susp<const Cell<T>>>(f);
+    }
 	Stream(T v, Stream const & s)
 	{
 		FutCell<T> f = CellFun<T>(v, s);

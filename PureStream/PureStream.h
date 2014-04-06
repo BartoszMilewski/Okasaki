@@ -64,8 +64,7 @@ private:
 template<class T>
 class Stream;
 
-// A Cell may be Empty or contain (own) an Item
-// An Item contains a value and a (lazy) Stream
+// A Cell contains a value and a (lazy) Stream
 
 template<class T>
 class Cell
@@ -95,7 +94,8 @@ template<class T>
 class CellFun
 {
 public:
-	CellFun(T v, Stream<T> const & s) : _v(v), _s(s) {}
+    CellFun(T v, Stream<T> const & s) : _v(v), _s(s) {}
+    explicit CellFun(T v) : _v(v) {}
 
 	Cell<T> operator()()
 	{
@@ -105,8 +105,8 @@ public:
 	Stream<T> _s;
 };
 
-// Streams are ref-counted
-// Stream contains a suspended Cell
+// Stream is either empty
+// or contains a suspended Cell
 
 template<class T>
 class Stream
@@ -115,12 +115,17 @@ private:
 	std::shared_ptr <Susp<Cell<T>>> _lazyCell;
 public:
 	Stream() {}
-	Stream(T v, Stream const & s)
-	{
-		auto f = CellFun<T>(v, s);
-		_lazyCell = std::make_shared<Susp<Cell<T>>>(f);
-	}
-	Stream(std::function<Cell<T>()> f)
+    explicit Stream(T v)
+    {
+        auto f = CellFun<T>(v);
+        _lazyCell = std::make_shared<Susp<Cell<T>>>(f);
+    }
+    Stream(T v, Stream const & s)
+    {
+        auto f = CellFun<T>(v, s);
+        _lazyCell = std::make_shared<Susp<Cell<T>>>(f);
+    }
+    Stream(std::function<Cell<T>()> f)
 		: _lazyCell(std::make_shared<Susp<Cell<T>>>(f))
 	{}
 	bool isEmpty() const
@@ -135,7 +140,7 @@ public:
 	{
 		return _lazyCell->get().pop_front();
 	}
-	// for debugging only
+    // for debugging only
 	bool isForced() const
 	{
 		return !isEmpty() && _lazyCell->isForced();
@@ -185,8 +190,8 @@ private:
 // Lazy concatentation of two streams
 
 template<class T>
-Stream<T> concat(Stream<T> const & lft
-	, Stream<T> const & rgt)
+Stream<T> concat( Stream<T> const & lft
+	            , Stream<T> const & rgt)
 {
 	if (lft.isEmpty())
 		return rgt;
@@ -197,6 +202,17 @@ Stream<T> concat(Stream<T> const & lft
 		return Cell<T>(val, concat<T>(tail, rgt));
 	});
 }
+
+template<class T, class F>
+void forEach(Stream<T> strm, F f)
+{
+    while (!strm.isEmpty())
+    {
+        f(strm.get());
+        strm = strm.pop_front();
+    }
+}
+
 
 // Lazy FIFO queue with two lazy streams
 

@@ -1,4 +1,5 @@
 #include "PureStream.h"
+#include "../List/List.h"
 #include <iostream>
 
 template<class T>
@@ -120,11 +121,53 @@ void testQ()
 	printQ(q3);
 }
 
-void main()
+template<class T>
+Stream<T> concatAll(List<Stream<T>> const & in)
 {
-	test0();
-	auto t = test();
-	std::cout << "force take 5\n";
-	forcePrint(t);
-	testQ();
+    if (in.isEmpty())
+        return Stream<T>();
+    Stream<T> strm = in.front();
+    List<Stream<T>> tailStrm = in.pop_front();
+    if (strm.isEmpty())
+        return concatAll(tailStrm);
+    return Stream<T>([=]()
+    {
+        T val = strm.get();
+        auto tail = strm.pop_front();
+        return Cell<T>(val, concatAll<T>(tailStrm.push_front(tail)));
+    });
+}
+
+template<class T>
+Stream<T> mkStream(List<T> lst)
+{
+    Stream<T> strm;
+    lst.forEach([&](T val){
+        strm = Stream<T>(val, strm);
+    });
+    return strm;
+}
+
+Stream<int> testCat()
+{
+    List<int> lst1 = { 1, 3, 5, 7 };
+    Stream<int> s1 = mkStream<int>(lst1);
+    List<int> lst2 = {10, 20, 30 };
+    Stream<int> s2 = mkStream<int>(lst2);
+    List<int> lst3 = { 100, 200, 300 };
+    Stream<int> s3 = mkStream<int>(lst3);
+    List<Stream<int>> lss;
+    lss = lss.push_front(s3);
+    lss = lss.push_front(s2);
+    lss = lss.push_front(s1);
+    return concatAll(lss);
+}
+
+
+void main()
+
+{
+    auto s = testCat();
+    lazyPrint(s);
+    forcePrint(s);
 }
