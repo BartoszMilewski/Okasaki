@@ -128,7 +128,15 @@ public:
     Stream(std::function<Cell<T>()> f)
 		: _lazyCell(std::make_shared<Susp<Cell<T>>>(f))
 	{}
-	bool isEmpty() const
+    Stream(Stream && stm)
+        : _lazyCell(std::move(stm._lazyCell))
+    {}
+    Stream & operator=(Stream && stm)
+    {
+        _lazyCell = std::move(stm._lazyCell);
+        return *this;
+    }
+    bool isEmpty() const
 	{
 		return !_lazyCell;
 	}
