@@ -1,65 +1,7 @@
 #include <cassert>
 #include <functional>
 #include <memory>
-#include <atomic>
-
-// This is a suspension for value of type T
-// Value is accessed through a thunk
-// Originally the thunk is set to "thunkForce",
-// which will force the evaluation and memoization
-// of the suspended value
-// After that the thunk is switched to "thunkGet",
-// which simply accesses the memoized value
-
-template<class T>
-class Susp
-{
-    // thunk
-    static T const & thunkForce(Susp * susp)
-    {
-        return susp->setMemo();
-    }
-    // thunk
-    static T const & thunkGet(Susp * susp)
-    {
-        return susp->getMemo();
-    }
-
-    T const & getMemo()
-    {
-        return _memo;
-    }
-    T const & setMemo()
-    {
-        _memo = _f();
-        // release barrier (_memo becomes visible)
-        _thunk.store(&thunkGet, std::memory_order_release);
-        return getMemo();
-    }
-public:
-    explicit Susp(std::function<T()> f)
-        : _f(f), _thunk(&thunkForce), _memo(T())
-    {}
-    T const & get() 
-    {
-        // acquire barrier
-        auto f = _thunk.load(std::memory_order_acquire);
-        return f(this);
-    }
-    // We use it for debugging
-    bool isForced() const
-    {
-        // acquire barrier
-        auto f = _thunk.load(std::memory_order_acquire);
-        return f == &thunkGet;
-    }
-private:
-    // Atomic pointer to function with release/acquire semantics
-    mutable std::atomic<T const & (*)(Susp *)> _thunk;
-    mutable T   _memo;
-
-    std::function<T()> _f;
-};
+#include "Susp.h"
 
 template<class T>
 class Stream;

@@ -1,6 +1,33 @@
 #include "PureStream.h"
 #include "../List/List.h"
 #include <iostream>
+#include <vector>
+#include <numeric>
+#include <string>
+
+Susp<std::vector<int>> ints(int from, int to)
+{
+    return Susp<std::vector<int>>([=]()
+    {
+        std::vector<int> v;
+        for (int i = from; i <= to; ++i)
+            v.push_back(i);
+        return v;
+    });
+}
+
+Susp<int> sum(std::vector<int> v)
+{
+    return Susp<int>([=]()
+    {
+        return std::accumulate(v.begin(), v.end(), 0);
+    });
+}
+
+Susp<int> one()
+{
+    return Susp<int>([]() { return 1; });
+}
 
 template<class T>
 void lazyPrint(Stream<T> const & s)
@@ -163,11 +190,29 @@ Stream<int> testCat()
     return concatAll(lss);
 }
 
+int testMonad()
+{
+    Susp<int> x = mjoin(fmap(ints(1, 4), sum));
+    Susp<int> y = mbind(ints(1, 4), sum);
+    return y.get();
+}
+
+Susp<std::string> blah(int i, std::string s)
+{
+    if (i == 0)
+        return munit(s + "...");
+    return blah(i - 1, s + " yada");
+}
+
+std::string testUnit()
+{
+    return blah(3, "Testing").get();
+}
 
 void main()
-
 {
-    auto s = testCat();
-    lazyPrint(s);
-    forcePrint(s);
+    std::cout << testUnit() << std::endl;
+    //auto s = testCat();
+    //lazyPrint(s);
+    //forcePrint(s);
 }
