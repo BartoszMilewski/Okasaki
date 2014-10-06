@@ -30,10 +30,7 @@ std::vector<T> when_all_vec(std::vector<std::future<T>> & ftrs)
 template<class T>
 std::vector<T> concatAll(std::vector<std::vector<T>> const & in)
 {
-    unsigned total = std::accumulate(in.begin(), in.end(), 0u,
-        [](unsigned sum, std::vector<T> const & v) { return sum + v.size(); });
     std::vector<T> res;
-    res.reserve(total);
     std::for_each(in.begin(), in.end(), [&res](std::vector<T> const & v){
         std::copy(v.begin(), v.end(), std::back_inserter(res));
     });
@@ -136,7 +133,6 @@ std::vector<typename Partial::SolutionT> generate(Partial const & part, Constrai
         SolutionVec result;
         forEach(std::move(partList), [&](Partial const & part){
             SolutionVec lst = generate(part, constr);
-            result.reserve(result.size() + lst.size());
             std::copy(lst.begin(), lst.end(), std::back_inserter(result));
         });
         return result;
