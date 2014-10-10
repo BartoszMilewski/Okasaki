@@ -42,7 +42,7 @@ public:
         RBTree t;
         for (T v : init)
         {
-            t = t.insert(v);
+            t = t.inserted(v);
         }
         _root = t._root;
     }
@@ -51,7 +51,7 @@ public:
     {
         RBTree t;
         for_each(b, e, [&t](T const & v){
-            t = t.insert(v);
+            t = t.inserted(v);
         });
         _root = t._root;
     }
@@ -83,7 +83,7 @@ public:
         else
             return true;
     }
-    RBTree insert(T x) const
+    RBTree inserted(T x) const
     {
         RBTree t = ins(x);
         return RBTree(B, t.left(), t.root(), t.right());
@@ -201,13 +201,13 @@ void forEach(RBTree<T> const & t, F f) {
 }
 
 template<class T, class Beg, class End>
-RBTree<T> insert(RBTree<T> t, Beg it, End end)
+RBTree<T> inserted(RBTree<T> t, Beg it, End end)
 {
     if (it == end)
         return t;
     T item = *it;
-    auto t1 = insert(t, ++it, end);
-    return t1.insert(item);
+    auto t1 = inserted(t, ++it, end);
+    return t1.inserted(item);
 }
 
 template<class T>
@@ -217,7 +217,7 @@ RBTree<T> treeUnion(RBTree<T> const & a, RBTree<T> const & b)
     RBTree<T> res = a;
     forEach(b, [&res, &a](T const & v){
         if (!a.member(v))
-            res.insert(v);
+            res.inserted(v);
     });
     return res;
 }

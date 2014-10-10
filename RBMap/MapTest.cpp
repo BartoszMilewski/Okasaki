@@ -7,7 +7,7 @@
 void main()
 {
     RBMap<int, std::string> map;
-    auto map1 = map.insert(7, "foo").insert(1, "bar").insert(4, "baz");
+    auto map1 = map.inserted(7, "foo").inserted(1, "bar").inserted(4, "baz");
     std::cout << map1 << std::endl;
     auto s = map1.findWithDefault("none", 3);
     std::cout << s << std::endl;

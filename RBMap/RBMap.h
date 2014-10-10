@@ -83,13 +83,13 @@ public:
         else
             return rootValue();
     }
-    RBMap insert(K x, V v) const
+    RBMap inserted(K x, V v) const
     {
         RBMap t = ins(x, v);
         return RBMap(B, t.left(), t.rootKey(), t.rootValue(), t.right());
     }
     template<class F>
-    RBMap insertWith(K k, V v, F combine)
+    RBMap insertedWith(K k, V v, F combine)
     {
         RBMap t = insWith(k, v, combine);
         return RBMap(B, t.left(), t.rootKey(), t.rootValue(), t.right());
@@ -244,7 +244,7 @@ RBMap<K, V> fromListOfPairs(I beg, I end)
 {
     RBMap<K, V> map;
     for (auto it = beg; it != end; ++it)
-        map = map.insert(it->first, it->second);
+        map = map.inserted(it->first, it->second);
     return map;
 }
 

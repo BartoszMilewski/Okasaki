@@ -60,7 +60,7 @@ public:
 
 	bool isEmpty() const { return !_item; }
 	T val() const { return _item->val(); }
-	Stream<T> pop_front() const { return _item->tail(); }
+	Stream<T> popped_front() const { return _item->tail(); }
 private:
 	std::unique_ptr<const Item> _item;
 };
@@ -110,9 +110,9 @@ public:
 	{
 		return _lazyCell->force().val();
 	}
-	Stream<T> pop_front() const
+	Stream<T> popped_front() const
 	{
-		return _lazyCell->force().pop_front();
+		return _lazyCell->force().popped_front();
 	}
 	// for debugging only
 	bool isForced() const
@@ -124,7 +124,7 @@ public:
 		if (n == 0 || isEmpty())
 			return Stream();
 		auto v = get();
-		auto t = pop_front();
+		auto t = popped_front();
 		return Stream([=]()
 		{
 			return std::unique_ptr<Cell<T>>(new Cell<T>(v, t.take(n - 1)));
@@ -136,10 +136,10 @@ public:
 			return *this;
 		if (isEmpty())
 			return Stream();
-		auto t = pop_front();
+		auto t = popped_front();
 		return t.drop(n - 1);
 	}
-	Stream reverse() const
+	Stream reversed() const
 	{
 		return rev(Stream());
 	}
@@ -149,7 +149,7 @@ private:
 		if (isEmpty())
 			return acc;
 		auto v = get();
-		auto t = pop_front();
+		auto t = popped_front();
 		Stream nextAcc([=]
 		{
 			return std::unique_ptr<Cell<T>>(new Cell<T>(v, acc));
@@ -170,7 +170,7 @@ Stream<T> concat(Stream<T> const & lft
 	return Stream<T>([=]()
 	{
 		T val = lft.get();
-		auto tail = lft.pop_front();
+		auto tail = lft.popped_front();
 		return std::unique_ptr<const Cell<T>>(new Cell<T>(val, concat<T>(tail, rgt)));
 	});
 }

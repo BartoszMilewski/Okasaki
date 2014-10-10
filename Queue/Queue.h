@@ -18,12 +18,12 @@ public:
 		assert(!isEmpty());
 		return _front.front();
 	}
-	Queue pop_front()
+	Queue popped_front()
 	{
 		assert(!isEmpty());
-		return check(_front.pop_front(), _rear);
+		return check(_front.popped_front(), _rear);
 	}
-	Queue push_back(T v)
+	Queue pushed_back(T v)
 	{
 		return check(_front, List<T>(v, _rear));
 	}
@@ -41,11 +41,11 @@ private:
 		{
 			if (!r.isEmpty())
 				std::cout << "> Reversing\n";
-			return Queue(reverse(r), List<T>());
+			return Queue(reversed(r), List<T>());
 		}
 		else
 			return Queue(f, r);
 	}
 	List<T> _front;
-	List<T> _rear; // reversed
+	List<T> _rear; // reversedd
 };

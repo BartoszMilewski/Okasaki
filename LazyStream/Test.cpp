@@ -19,7 +19,7 @@ void forcePrint(Stream<T> const & s)
 	else
 	{
 		T v = s.get();
-		auto tail = s.pop_front();
+		auto tail = s.popped_front();
 		std::cout << v << " ";
 		forcePrint(tail);
 	}
@@ -35,7 +35,7 @@ void lazyPrint(Stream<T> const & s)
 	else if (s.isForced())
 	{
 		T v = s.get();
-		auto tail = s.pop_front();
+		auto tail = s.popped_front();
 		std::cout << v << " ";
 		lazyPrint(tail);
 	}
@@ -54,7 +54,7 @@ void main()
 	lazyPrint(s);
 	int x = s.get();
 	lazyPrint(s);
-	auto tail = s.pop_front();
+	auto tail = s.popped_front();
 	lazyPrint(s);
 	int y = tail.get();
 	lazyPrint(s);
@@ -76,11 +76,11 @@ void main()
 	lazyPrint(s);
 	*/
 
-	auto rev = s.reverse();
-	std::cout << "Reverse (forces the original): ";
+	auto rev = s.reversed();
+	std::cout << "reversed (forces the original): ";
 	lazyPrint(rev);
 	lazyPrint(s);
-	std::cout << "Force reversed stream: ";
+	std::cout << "Force reversedd stream: ";
 	forcePrint(rev);
 
 	std::cout << "Force: \n";

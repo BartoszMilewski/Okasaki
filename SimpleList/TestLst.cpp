@@ -6,10 +6,10 @@
 List<char> test1()
 {
 	List<char> lst0;
-	auto lst1 = lst0.push_front('a');
+	auto lst1 = lst0.pushed_front('a');
 	// a: ref 1
 	print(lst1);
-	auto lst2 = lst1.push_front('b');
+	auto lst2 = lst1.pushed_front('b');
 	// b: ref 1
 	// a: ref 2
 	print(lst2);
@@ -23,7 +23,7 @@ List<char> test2()
 	// b: ref 1
 	// a: ref 1
 	print(lst3);
-	auto lst4 = lst3.insertAt(1, 'x'); // {b, x, a}
+	auto lst4 = lst3.insertedAt(1, 'x'); // {b, x, a}
 	// x: ref 1
 	// b: ref 2
 	// a: ref 1

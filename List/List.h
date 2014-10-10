@@ -51,49 +51,49 @@ public:
         assert(!isEmpty());
         return _head->_val;
     }
-    List pop_front() const
+    List popped_front() const
     {
         assert(!isEmpty());
         return List(_head->_next);
     }
     // Additional utilities
-    List push_front(T v) const
+    List pushed_front(T v) const
     {
         return List(v, *this);
     }
     List take(int n)
     {
         if (n <= 0 || isEmpty()) return List();
-        return pop_front().take(n - 1).push_front(front());
+        return popped_front().take(n - 1).pushed_front(front());
     }
-    List insertAt(int i, T v) const
+    List insertedAt(int i, T v) const
     {
         if (i == 0)
-            return push_front(v);
+            return pushed_front(v);
         else {
             assert(!isEmpty());
-            return List<T>(front(), pop_front().insertAt(i - 1, v));
+            return List<T>(front(), popped_front().insertedAt(i - 1, v));
         }
     }
-    List remove(T v) const
+    List removed(T v) const
     {
         if (isEmpty()) return List();
         if (v == front())
-            return pop_front().remove(v);
-        return List(front(), pop_front().remove(v));
+            return popped_front().removed(v);
+        return List(front(), popped_front().removed(v));
     }
-    List remove1(T v) const
+    List removed1(T v) const
     {
         if (isEmpty()) return List();
         if (v == front())
-            return pop_front();
-        return List(front(), pop_front().remove(v));
+            return popped_front();
+        return List(front(), popped_front().removed(v));
     }
     bool member(T v) const
     {
         if (isEmpty()) return false;
         if (v == front()) return true;
-        return pop_front().member(v);
+        return popped_front().member(v);
     }
     template<class F>
     void forEach(F f) const
@@ -176,7 +176,7 @@ List<T> concat(List<T> const & a, List<T> const & b)
 {
     if (a.isEmpty())
         return b;
-    return List<T>(a.front(), concat(a.pop_front(), b));
+    return List<T>(a.front(), concat(a.popped_front(), b));
 }
 
 template<class U, class T, class F>
@@ -187,7 +187,7 @@ List<U> fmap(F f, List<T> lst)
     if (lst.isEmpty()) 
         return List<U>();
     else
-        return List<U>(f(lst.front()), fmap<U>(f, lst.pop_front()));
+        return List<U>(f(lst.front()), fmap<U>(f, lst.popped_front()));
 }
 
 template<class T, class P>
@@ -198,9 +198,9 @@ List<T> filter(P p, List<T> lst)
     if (lst.isEmpty())
         return List<T>();
     if (p(lst.front()))
-        return List<T>(lst.front(), filter(p, lst.pop_front()));
+        return List<T>(lst.front(), filter(p, lst.popped_front()));
     else
-        return filter(p, lst.pop_front());
+        return filter(p, lst.popped_front());
 }
 
 template<class T, class U, class F>
@@ -211,7 +211,7 @@ U foldr(F f, U acc, List<T> lst)
     if (lst.isEmpty())
         return acc;
     else
-        return f(lst.front(), foldr(f, acc, lst.pop_front()));
+        return f(lst.front(), foldr(f, acc, lst.popped_front()));
 }
 
 template<class T, class U, class F>
@@ -222,7 +222,7 @@ U foldl(F f, U acc, List<T> lst)
     if (lst.isEmpty())
         return acc;
     else
-        return foldl(f, f(acc, lst.front()), lst.pop_front());
+        return foldl(f, f(acc, lst.front()), lst.popped_front());
 }
 
 // Set difference a \ b
@@ -230,19 +230,19 @@ template<class T>
 List<T> diff(List<T> const & as, List<T> const & bs)
 {
     return foldl([](List<T> const & acc, T x) {
-        return acc.remove(x);
+        return acc.removed(x);
     }, as, bs);
 }
 
 // Set union of two lists, xs u ys
 // Assume no duplicates inside either list
 template<class T>
-List<T> unionize(List<T> const & xs, List<T> const & ys)
+List<T> unionized(List<T> const & xs, List<T> const & ys)
 {
     // xs u ys = (ys \ xs) ++ xs
-    // remove all xs from ys
+    // removed all xs from ys
     auto trimmed = foldl([](List<T> const & acc, T x) {
-        return acc.remove(x);
+        return acc.removed(x);
     }, ys, xs);
     return concat(trimmed, xs);
 }
@@ -251,7 +251,7 @@ template<class T>
 List<T> concatAll(List<List<T>> const & xss)
 {
     if (xss.isEmpty()) return List<T>();
-    return concat(xss.front(), concatAll(xss.pop_front()));
+    return concat(xss.front(), concatAll(xss.popped_front()));
 }
 
 // consumes the list when called: 
@@ -264,7 +264,7 @@ void forEach(List<T> lst, F f)
                  "forEach requires a function type void(T)");
     while (!lst.isEmpty()) {
         f(lst.front());
-        lst = lst.pop_front();
+        lst = lst.popped_front();
     }
 }
 
@@ -282,7 +282,7 @@ template<class T, class F>
 List<T> iterateN(F f, T init, int count)
 {
     if (count <= 0) return List<T>();
-    return iterateN(f, f(init), count - 1).push_front(init);
+    return iterateN(f, f(init), count - 1).pushed_front(init);
 }
 
 // Pass lst by value not reference!
@@ -294,7 +294,7 @@ void printRaw(List<T> lst)
     }
     else {
         std::cout << "(" << lst.front() << ", " << lst.headCount() - 1 << ") ";
-        printRaw(lst.pop_front());
+        printRaw(lst.popped_front());
     }
 }
 
@@ -310,7 +310,7 @@ std::ostream& operator<<(std::ostream& os, List<T> const & lst)
 }
 
 template<class T>
-List<T> reverse(List<T> const & lst)
+List<T> reversed(List<T> const & lst)
 {
     return foldl([](List<T> const & acc, T v)
     {

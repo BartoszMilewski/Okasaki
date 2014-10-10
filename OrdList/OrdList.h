@@ -28,18 +28,18 @@ public:
 		assert(!isEmpty());
 		return _head->_val;
 	}
-	OrdList pop_front() const
+	OrdList popped_front() const
 	{
 		assert(!isEmpty());
 		return OrdList(_head->_next);
 	}
 	// Additional utilities
-	OrdList insert(T v) const
+	OrdList inserted(T v) const
 	{
 		if (isEmpty() || v <= front())
 			return OrdList(v, OrdList(_head));
 		else {
-			return OrdList<T>(front(), pop_front().insert(v));
+			return OrdList<T>(front(), popped_front().inserted(v));
 		}
 	}
 	// For debugging
@@ -50,16 +50,16 @@ private:
 
 
 template<class T>
-OrdList<T> merge(OrdList<T> const & a, OrdList<T> const & b)
+OrdList<T> merged(OrdList<T> const & a, OrdList<T> const & b)
 {
 	if (a.isEmpty())
 		return b;
 	if (b.isEmpty())
 		return a;
 	if (a.front() <= b.front())
-		return OrdList<T>(a.front(), merge(a.pop_front(), b));
+		return OrdList<T>(a.front(), merged(a.popped_front(), b));
 	else
-		return OrdList<T>(b.front(), merge(a, b.pop_front()));
+		return OrdList<T>(b.front(), merged(a, b.popped_front()));
 }
 
 // For debugging
@@ -71,6 +71,6 @@ void print(OrdList<T> lst)
 	}
 	else {
 		std::cout << "(" << lst.front() << ", " << lst.headCount() - 1 << ") ";
-		print(lst.pop_front());
+		print(lst.popped_front());
 	}
 }

@@ -28,7 +28,7 @@ public:
 		Tree t;
 		for (T v: init)
 		{
-			t = t.insert(v);
+			t = t.inserted(v);
 		}
 		_root = t._root;
 	}
@@ -60,15 +60,15 @@ public:
 		else
 			return true;
 	}
-	Tree insert(T x) const
+	Tree inserted(T x) const
 	{
 		if (isEmpty())
 			return Tree(Tree(), x, Tree());
 		T y = root();
 		if (x < y)
-			return Tree(left().insert(x), y, right());
+			return Tree(left().inserted(x), y, right());
 		else if (y < x)
-			return Tree(left(), y, right().insert(x));
+			return Tree(left(), y, right().inserted(x));
 		else
 			return *this; // no duplicates
 	}

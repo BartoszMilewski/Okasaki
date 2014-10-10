@@ -9,15 +9,15 @@ public:
 		: _lenF(lf), _front(f), _lenR(lr), _rear(r)
 	{}
 	bool isEmpty() const { return _lenF == 0; }
-	Queue push_back(T x) const
+	Queue pushed_back(T x) const
 	{
 		return check(_lenF, _front, _lenR + 1, Stream<T>(x, _rear));
 	}
 	T front() const { return _front.get(); }
 	
-	Queue pop_front() const
+	Queue popped_front() const
 	{
-		return check(_lenF - 1, _front.pop_front(), _lenR, _rear);
+		return check(_lenF - 1, _front.popped_front(), _lenR, _rear);
 	}
 	// for debugging only
 	int lenF() const { return _lenF; }
@@ -28,7 +28,7 @@ private:
 	static Queue check(int lf, Stream<T> f, int lr, Stream<T> r)
 	{
 		if (lr <= lf) return Queue(lf, f, lr, r);
-		return Queue(lf + lr, concat(f, r.reverse()), 0, Stream<T>());
+		return Queue(lf + lr, concat(f, r.reversed()), 0, Stream<T>());
 	}
 private:
 	int _lenF;

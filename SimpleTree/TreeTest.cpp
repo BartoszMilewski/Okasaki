@@ -17,7 +17,7 @@ void print(Tree<T> const & t, int offset = 0)
 void testHigher()
 {
 	Tree<int> t0;
-	auto t = t0.insert(2).insert(4).insert(3).insert(5).insert(6).insert(1);
+	auto t = t0.inserted(2).inserted(4).inserted(3).inserted(5).inserted(6).inserted(1);
 	forEach(t, [](int x)
 	{
 		std::cout << x << " ";
@@ -38,7 +38,7 @@ void testInit()
 void main()
 {
 	testInit();
-	auto t = Tree<int>().insert(2).insert(4).insert(3).insert(5).insert(6).insert(1);
+	auto t = Tree<int>().inserted(2).inserted(4).inserted(3).inserted(5).inserted(6).inserted(1);
 	std::cout << "Is member 1? " << t.member(1) << std::endl;
 	std::cout << "Is member 10? " << t.member(10) << std::endl;
 

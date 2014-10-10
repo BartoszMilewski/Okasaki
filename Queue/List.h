@@ -37,23 +37,23 @@ public:
 		assert(!isEmpty());
 		return _head->_val;
 	}
-	List pop_front() const
+	List popped_front() const
 	{
 		assert(!isEmpty());
 		return List(_head->_next);
 	}
 	// Additional utilities
-	List prepend(T v) const
+	List prepended(T v) const
 	{
 		return List(v, *this);
 	}
-	List insertAt(int i, T v) const
+	List insertedAt(int i, T v) const
 	{
 		if (i == 0)
-			return prepend(v);
+			return prepended(v);
 		else {
 			assert(!isEmpty());
-			return List<T>(front(), pop_front().insertAt(i - 1, v));
+			return List<T>(front(), popped_front().insertedAt(i - 1, v));
 		}
 	}
 	// For debugging
@@ -68,7 +68,7 @@ List<T> concat(List<T> const & a, List<T> const & b)
 {
 	if (a.isEmpty())
 		return b;
-	return List<T>(a.front(), concat(a.pop_front(), b));
+	return List<T>(a.front(), concat(a.popped_front(), b));
 }
 
 template<class U, class T, class F>
@@ -79,7 +79,7 @@ List<U> fmap(F f, List<T> lst)
     if (lst.isEmpty()) 
         return List<U>();
     else
-        return List<U>(f(lst.front()), fmap<U>(f, lst.pop_front()));
+        return List<U>(f(lst.front()), fmap<U>(f, lst.popped_front()));
 }
 
 template<class T, class P>
@@ -90,9 +90,9 @@ List<T> filter(P p, List<T> lst)
     if (lst.isEmpty())
         return List<T>();
     if (p(lst.front()))
-        return List<T>(lst.front(), filter(p, lst.pop_front()));
+        return List<T>(lst.front(), filter(p, lst.popped_front()));
     else
-        return filter(p, lst.pop_front());
+        return filter(p, lst.popped_front());
 }
 
 template<class T, class U, class F>
@@ -103,7 +103,7 @@ U foldr(F f, U acc, List<T> lst)
     if (lst.isEmpty())
         return acc;
     else
-        return f(lst.front(), foldr(f, acc, lst.pop_front()));
+        return f(lst.front(), foldr(f, acc, lst.popped_front()));
 }
 
 template<class T, class U, class F>
@@ -114,7 +114,7 @@ U foldl(F f, U acc, List<T> lst)
     if (lst.isEmpty())
         return acc;
     else
-        return foldl(f, f(acc, lst.front()), lst.pop_front());
+        return foldl(f, f(acc, lst.front()), lst.popped_front());
 }
 
 template<class T, class F>
@@ -124,12 +124,12 @@ void forEach(List<T> lst, F f)
                  "forEach requires a function type void(T)");
     if (!lst.isEmpty()) {
         f(lst.front());
-        forEach(lst.pop_front(), f);
+        forEach(lst.popped_front(), f);
     }
 }
 
 template<class T>
-List<T> reverse(List<T> const & lst)
+List<T> reversed(List<T> const & lst)
 {
 	return foldl([](List<T> const & acc, T v)
 	{
@@ -157,6 +157,6 @@ void print(List<T> lst)
 	}
 	else {
 		std::cout << "(" << lst.front() << ", " << lst.headCount() - 1 << ") ";
-		print(lst.pop_front());
+		print(lst.popped_front());
 	}
 }

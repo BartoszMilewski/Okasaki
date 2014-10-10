@@ -21,7 +21,7 @@ public:
     {
         return _v;
     }
-    Stream<T> pop_front() const
+    Stream<T> popped_front() const
     {
         return _tail;
     }
@@ -87,9 +87,9 @@ public:
     {
         return _lazyCell->get().val();
     }
-    Stream<T> pop_front() const
+    Stream<T> popped_front() const
     {
-        return _lazyCell->get().pop_front();
+        return _lazyCell->get().popped_front();
     }
     // for debugging only
     bool isForced() const
@@ -105,7 +105,7 @@ public:
         return Stream([cell, n]()
         {
             auto v = cell->get().val();
-            auto t = cell->get().pop_front();
+            auto t = cell->get().popped_front();
             return Cell<T>(v, t.take(n - 1));
         });
     }
@@ -115,11 +115,11 @@ public:
             return *this;
         if (isEmpty())
             return Stream();
-        auto t = pop_front();
+        auto t = popped_front();
         return t.drop(n - 1);
     }
-    // Lazy reverse
-    Stream reverse() const
+    // Lazy reversed
+    Stream reversed() const
     {
         return rev(Stream());
     }
@@ -129,7 +129,7 @@ private:
         if (isEmpty())
             return acc;
         auto v = get();
-        auto t = pop_front();
+        auto t = popped_front();
         Stream nextAcc([=]
         {
             return Cell<T>(v, acc);
@@ -148,7 +148,7 @@ Stream<T> concat( Stream<T> lft
         return rgt;
     return Stream<T>([=]()
     {
-        return Cell<T>(lft.get(), concat<T>(lft.pop_front(), rgt));
+        return Cell<T>(lft.get(), concat<T>(lft.popped_front(), rgt));
     });
 }
 
@@ -158,7 +158,7 @@ void forEach(Stream<T> strm, F f)
     while (!strm.isEmpty())
     {
         f(strm.get());
-        strm = strm.pop_front();
+        strm = strm.popped_front();
     }
 }
 
@@ -174,15 +174,15 @@ public:
         : _lenF(lf), _front(f), _lenR(lr), _rear(r)
     {}
     bool isEmpty() const { return _lenF == 0; }
-    Queue push_back(T x) const
+    Queue pushed_back(T x) const
     {
         return check(_lenF, _front, _lenR + 1, Stream<T>(x, _rear));
     }
     T front() const { return _front.get(); }
     
-    Queue pop_front() const
+    Queue popped_front() const
     {
-        return check(_lenF - 1, _front.pop_front(), _lenR, _rear);
+        return check(_lenF - 1, _front.popped_front(), _lenR, _rear);
     }
     // for debugging only
     int lenF() const { return _lenF; }
@@ -193,8 +193,8 @@ private:
     static Queue check(int lf, Stream<T> f, int lr, Stream<T> r)
     {
         if (lr <= lf) return Queue(lf, f, lr, r);
-        // Left stream is a lazy concatenation and reverse
-        return Queue(lf + lr, concat(f, r.reverse()), 0, Stream<T>());
+        // Left stream is a lazy concatenation and reversed
+        return Queue(lf + lr, concat(f, r.reversed()), 0, Stream<T>());
     }
 private:
     int _lenF;

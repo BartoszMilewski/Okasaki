@@ -39,7 +39,7 @@ void lazyPrint(Stream<T> const & s)
 	else if (s.isForced())
 	{
 		T v = s.get();
-		auto tail = s.pop_front();
+		auto tail = s.popped_front();
 		std::cout << v << " ";
 		lazyPrint(tail);
 	}
@@ -59,7 +59,7 @@ void forcePrint(Stream<T> const & s)
 	else
 	{
 		T v = s.get();
-		auto tail = s.pop_front();
+		auto tail = s.popped_front();
 		std::cout << v << " ";
 		forcePrint(tail);
 	}
@@ -91,8 +91,8 @@ Stream<int> test1()
 Stream<int> test3()
 {
 	auto s4 = test1();
-	auto rv = s4.reverse();
-	std::cout << "Reversed\n";
+	auto rv = s4.reversed();
+	std::cout << "reversedd\n";
 	lazyPrint(rv);
 	forcePrint(rv);
 	auto cat = concat(s4, rv);
@@ -125,11 +125,11 @@ void testQ()
 	std::cout << "Test Lazy Queue\n";
 
 	Queue<int> q0;
-	auto q1 = q0.push_back(10);
+	auto q1 = q0.pushed_back(10);
 	printQ(q1);
-	auto q2 = q1.push_back(20);
+	auto q2 = q1.pushed_back(20);
 	printQ(q2);
-	auto q3 = q2.push_back(30);
+	auto q3 = q2.pushed_back(30);
 	
 	std::cout << "Three element queue\n";
 
@@ -138,11 +138,11 @@ void testQ()
 	std::cout << "Pop: " << x << std::endl;
 	printQ(q3);
 	std::cout << "Tail\n";
-	auto t1 = q3.pop_front();
+	auto t1 = q3.popped_front();
 	printQ(t1);
 	std::cout << std::endl;
 	std::cout << "Tail of tail\n";
-	auto t2 = t1.pop_front();
+	auto t2 = t1.popped_front();
 	printQ(t2);
 	std::cout << "Original\n";
 	printQ(q3);
@@ -154,14 +154,14 @@ Stream<T> concatAll(List<Stream<T>> const & in)
     if (in.isEmpty())
         return Stream<T>();
     Stream<T> strm = in.front();
-    List<Stream<T>> tailStrm = in.pop_front();
+    List<Stream<T>> tailStrm = in.popped_front();
     if (strm.isEmpty())
         return concatAll(tailStrm);
     return Stream<T>([=]()
     {
         T val = strm.get();
-        auto tail = strm.pop_front();
-        return Cell<T>(val, concatAll<T>(tailStrm.push_front(tail)));
+        auto tail = strm.popped_front();
+        return Cell<T>(val, concatAll<T>(tailStrm.pushed_front(tail)));
     });
 }
 
@@ -184,9 +184,9 @@ Stream<int> testCat()
     List<int> lst3 = { 100, 200, 300 };
     Stream<int> s3 = mkStream<int>(lst3);
     List<Stream<int>> lss;
-    lss = lss.push_front(s3);
-    lss = lss.push_front(s2);
-    lss = lss.push_front(s1);
+    lss = lss.pushed_front(s3);
+    lss = lss.pushed_front(s2);
+    lss = lss.pushed_front(s1);
     return concatAll(lss);
 }
 

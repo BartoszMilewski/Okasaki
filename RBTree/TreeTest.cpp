@@ -29,7 +29,7 @@ void main()
 						"A RED BLACK TREE WALKS INTO A BAR "
 						"HAS JOHNNY WALKER ON THE ROCKS "
 						"AND QUICKLY REBALANCES ITSELF.";
-	auto t = insert(RBTree<char>(), init.begin(), init.end());
+	auto t = inserted(RBTree<char>(), init.begin(), init.end());
 	print(t);
 	t.assert1();
 	std::cout << "Black depth: " << t.countB() << std::endl;

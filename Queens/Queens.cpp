@@ -100,7 +100,7 @@ List<PartSol> PartSol::refine(int dim) const
     for (int col = 0; col < dim; ++col)
     {
         if (isAllowed(Pos(col, _curRow)))
-            parts = parts.push_front(PartSol(_curRow + 1,  _queens.push_front(Pos(col, _curRow))));
+            parts = parts.pushed_front(PartSol(_curRow + 1,  _queens.pushed_front(Pos(col, _curRow))));
     }
     return parts;
 }

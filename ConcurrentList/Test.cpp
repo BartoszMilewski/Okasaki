@@ -7,7 +7,7 @@ List<int> fillList(int a, int b)
 {
 	List<int> lst;
 	for (int i = a; i < b; ++i)
-		lst = lst.push_front(i);
+		lst = lst.pushed_front(i);
 	return lst;
 }
 
@@ -22,7 +22,7 @@ void combineL(std::vector<List<int>>::const_iterator it,
 		if (it->isEmpty())
 			return;
 		sum += it->front();
-		tails.push_back(it->pop_front());
+		tails.push_back(it->popped_front());
 		++it;
 	}
 	acc.push_back(sum);

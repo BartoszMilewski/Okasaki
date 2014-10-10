@@ -104,7 +104,7 @@ Stream<PartSol> PartSol::refineRow(int col, int dim) const
         return Stream<PartSol>();
     return Stream<PartSol>([this, col, dim]() -> Cell<PartSol>
     {
-        PartSol part(_curRow + 1, _queens.push_front(Pos(col, _curRow)));
+        PartSol part(_curRow + 1, _queens.pushed_front(Pos(col, _curRow)));
         Stream<PartSol> tail = refineRow(col + 1, dim);
         return Cell<PartSol>(part, tail);
     });
