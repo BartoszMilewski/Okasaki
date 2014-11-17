@@ -84,6 +84,7 @@ bool isConflict(Pos const & p, Pos const & q)
     return p.col == q.col || p.row == q.row || abs(p.col - q.col) == abs(p.row - q.row);
 }
 
+/*
 bool PartSol::isAllowed(Pos const & pos) const
 {
     for (auto it = std::begin(_queens); it != std::end(_queens); ++it)
@@ -92,6 +93,12 @@ bool PartSol::isAllowed(Pos const & pos) const
             return false;
     }
     return true;
+}
+*/
+
+bool PartSol::isAllowed(Pos const & pos) const
+{
+    return all(_queens, [&pos](Pos const & q){ return !isConflict(q, pos); });
 }
 
 List<PartSol> PartSol::refine(int dim) const

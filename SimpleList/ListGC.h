@@ -22,13 +22,13 @@ public:
     // Cons
     List(T v, List tail) : _head(new Item(v, tail._head)) {}
     // From initializer list
-	List(std::initializer_list<T> init) : _head(nullptr)
-	{
-		for (auto it = std::rbegin(init); it != std::rend(init); ++it)
-		{
-			_head = new Item(*it, _head);
-		}
-	}
+    List(std::initializer_list<T> init) : _head(nullptr)
+    {
+        for (auto it = std::rbegin(init); it != std::rend(init); ++it)
+        {
+            _head = new Item(*it, _head);
+        }
+    }
 
     bool isEmpty() const { return !_head; }
     T front() const

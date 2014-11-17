@@ -105,69 +105,79 @@ public:
             it = it->_next.get();
         }
     }
-	
-	friend class FwdListIter<T>;
+    
+    friend class FwdListIter<T>;
     // For debugging
     int headCount() const { return _head.use_count(); }
 private:
     std::shared_ptr<const Item> _head;
 };
 
+template<class T, class P>
+bool all(List<T> const & lst, P & p)
+{
+    if (lst.isEmpty())
+        return true;
+    if (!p(lst.front()))
+        return false;
+    return all(lst.popped_front(), p);
+}
+
 template<class T>
 class FwdListIter : public std::iterator<std::forward_iterator_tag, T>
 {
 public:
-	FwdListIter() {} // end
-	FwdListIter(List<T> const & lst) : _cur(lst._head)
-	{}
-	T operator*() const { return _cur->_val; }
-	FwdListIter & operator++()
-	{
-		_cur = _cur->_next;
-		return *this;
-	}
-	bool operator==(FwdListIter<T> const & other)
-	{
-		return _cur == other._cur;
-	}
-	bool operator!=(FwdListIter<T> const & other)
-	{
-		return !(*this == other);
-	}
+    FwdListIter() {} // end
+    FwdListIter(List<T> const & lst) : _cur(lst._head)
+    {}
+    T operator*() const { return _cur->_val; }
+    FwdListIter & operator++()
+    {
+        _cur = _cur->_next;
+        return *this;
+    }
+    bool operator==(FwdListIter<T> const & other)
+    {
+        return _cur == other._cur;
+    }
+    bool operator!=(FwdListIter<T> const & other)
+    {
+        return !(*this == other);
+    }
 private:
-	std::shared_ptr<const typename List<T>::Item> _cur;
+    std::shared_ptr<const typename List<T>::Item> _cur;
 };
 
 template<class T>
 class OutListIter : public std::iterator<std::output_iterator_tag, T>
 {
 public:
-	OutListIter() {}
-	T & operator*() { return _val; }
-	OutListIter & operator++()
-	{
-		_lst = List<T>(_val, _lst);
-		return *this;
-	}
-	List<T> getList() const { return _lst; }
+    OutListIter() {}
+    T & operator*() { return _val; }
+    OutListIter & operator++()
+    {
+        _lst = List<T>(_val, _lst);
+        return *this;
+    }
+    List<T> getList() const { return _lst; }
 private:
-	T _val;
-	List<T> _lst;
+    T _val;
+    List<T> _lst;
 };
 
 
 namespace std
 {
-	template<class T> 
-	FwdListIter<T> begin(List<T> const & lst)
-	{
-		return FwdListIter<T>(lst);
-	}
-	template<class T> 
-	FwdListIter<T> end(List<T> const & lst)
-	{
-		return FwdListIter<T>();
-	}
+    template<class T> 
+    FwdListIter<T> begin(List<T> const & lst)
+    {
+        return FwdListIter<T>(lst);
+    }
+    template<class T> 
+    FwdListIter<T> end(List<T> const & lst)
+    {
+        return FwdListIter<T>();
+    }
 }
 
 

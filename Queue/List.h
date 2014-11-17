@@ -7,68 +7,68 @@
 template<class T>
 class List
 {
-	struct Item
-	{
-		Item(T v, std::shared_ptr<const Item> const & tail) : _val(v), _next(tail) {}
-		// For debugging only
-		~Item() { std::cout << "! " << _val << std::endl; }
-		T _val;
-		std::shared_ptr<const Item> _next;
-	};
-	friend Item;
-	explicit List(std::shared_ptr<const Item> const & items) : _head(items) {}
+    struct Item
+    {
+        Item(T v, std::shared_ptr<const Item> const & tail) : _val(v), _next(tail) {}
+        // For debugging only
+        ~Item() { std::cout << "! " << _val << std::endl; }
+        T _val;
+        std::shared_ptr<const Item> _next;
+    };
+    friend Item;
+    explicit List(std::shared_ptr<const Item> const & items) : _head(items) {}
 public:
-	// Empty list
-	List() {}
-	// Cons
-	List(T v, List const & tail) : _head(std::make_shared<Item>(v, tail._head)) {}
-	// From initializer list
-	List(std::initializer_list<T> init)
-	{
-		for (auto it = std::rbegin(init); it != std::rend(init); ++it)
-		{
-			_head = std::make_shared<Item>(*it, _head);
-		}
-	}
+    // Empty list
+    List() {}
+    // Cons
+    List(T v, List const & tail) : _head(std::make_shared<Item>(v, tail._head)) {}
+    // From initializer list
+    List(std::initializer_list<T> init)
+    {
+        for (auto it = std::rbegin(init); it != std::rend(init); ++it)
+        {
+            _head = std::make_shared<Item>(*it, _head);
+        }
+    }
 
-	bool isEmpty() const { return !_head; } // conversion to bool
-	T front() const
-	{
-		assert(!isEmpty());
-		return _head->_val;
-	}
-	List popped_front() const
-	{
-		assert(!isEmpty());
-		return List(_head->_next);
-	}
-	// Additional utilities
-	List prepended(T v) const
-	{
-		return List(v, *this);
-	}
-	List insertedAt(int i, T v) const
-	{
-		if (i == 0)
-			return prepended(v);
-		else {
-			assert(!isEmpty());
-			return List<T>(front(), popped_front().insertedAt(i - 1, v));
-		}
-	}
-	// For debugging
-	int headCount() const { return _head.use_count(); }
+    bool isEmpty() const { return !_head; } // conversion to bool
+    T front() const
+    {
+        assert(!isEmpty());
+        return _head->_val;
+    }
+    List popped_front() const
+    {
+        assert(!isEmpty());
+        return List(_head->_next);
+    }
+    // Additional utilities
+    List prepended(T v) const
+    {
+        return List(v, *this);
+    }
+    List insertedAt(int i, T v) const
+    {
+        if (i == 0)
+            return prepended(v);
+        else {
+            assert(!isEmpty());
+            return List<T>(front(), popped_front().insertedAt(i - 1, v));
+        }
+    }
+    // For debugging
+    int headCount() const { return _head.use_count(); }
 private:
-	std::shared_ptr<const Item> _head;
+    std::shared_ptr<const Item> _head;
 };
 
 
 template<class T>
 List<T> concat(List<T> const & a, List<T> const & b)
 {
-	if (a.isEmpty())
-		return b;
-	return List<T>(a.front(), concat(a.popped_front(), b));
+    if (a.isEmpty())
+        return b;
+    return List<T>(a.front(), concat(a.popped_front(), b));
 }
 
 template<class U, class T, class F>
@@ -131,10 +131,10 @@ void forEach(List<T> lst, F f)
 template<class T>
 List<T> reversed(List<T> const & lst)
 {
-	return foldl([](List<T> const & acc, T v)
-	{
-		return List<T>(v, acc);
-	}, List<T>(), lst);
+    return foldl([](List<T> const & acc, T v)
+    {
+        return List<T>(v, acc);
+    }, List<T>(), lst);
 }
 
 
@@ -152,11 +152,11 @@ auto fromIt(Beg it, End end) -> List<typename Beg::value_type>
 template<class T>
 void print(List<T> lst)
 {
-	if (lst.isEmpty()) {
-		std::cout << std::endl;
-	}
-	else {
-		std::cout << "(" << lst.front() << ", " << lst.headCount() - 1 << ") ";
-		print(lst.popped_front());
-	}
+    if (lst.isEmpty()) {
+        std::cout << std::endl;
+    }
+    else {
+        std::cout << "(" << lst.front() << ", " << lst.headCount() - 1 << ") ";
+        print(lst.popped_front());
+    }
 }

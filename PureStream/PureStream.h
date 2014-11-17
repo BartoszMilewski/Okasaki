@@ -13,8 +13,8 @@ class Cell
 {
 public:
     Cell() {} // only to initialize _memo
-    Cell(T v, Stream<T> const & tail)
-        : _v(v), _tail(tail)
+    Cell(T v, Stream<T> tail)
+        : _v(v), _tail(std::move(tail))
     {}
     explicit Cell(T v) : _v(v) {}
     T val() const
@@ -37,7 +37,7 @@ template<class T>
 class CellFun
 {
 public:
-    CellFun(T v, Stream<T> const & s) : _v(v), _s(s) {}
+    CellFun(T v, Stream<T> s) : _v(v), _s(std::move(s)) {}
     explicit CellFun(T v) : _v(v) {}
 
     Cell<T> operator()()
@@ -63,22 +63,14 @@ public:
         auto f = CellFun<T>(v);
         _lazyCell = std::make_shared<Susp<Cell<T>>>(f);
     }
-    Stream(T v, Stream const & s)
+    Stream(T v, Stream s)
     {
-        auto f = CellFun<T>(v, s);
+        auto f = CellFun<T>(v, std::move(s));
         _lazyCell = std::make_shared<Susp<Cell<T>>>(f);
     }
     Stream(std::function<Cell<T>()> f)
         : _lazyCell(std::make_shared<Susp<Cell<T>>>(f))
     {}
-    Stream(Stream && stm)
-        : _lazyCell(std::move(stm._lazyCell))
-    {}
-    Stream & operator=(Stream && stm)
-    {
-        _lazyCell = std::move(stm._lazyCell);
-        return *this;
-    }
     bool isEmpty() const
     {
         return !_lazyCell;
@@ -152,6 +144,26 @@ Stream<T> concat( Stream<T> lft
     });
 }
 
+template<class T, class U, class F>
+auto zipWith(F f, Stream<T> lft, Stream<U> rgt) -> Stream<decltype(f(lft.get(), rgt.get()))>
+{
+    using S = decltype(f(lft.get(), rgt.get()));
+    if (lft.isEmpty() || rgt.isEmpty())
+        return Stream<S>();
+    return Stream<S>([=]()
+    {
+        return Cell<S>(f(lft.get(), rgt.get()), zipWith(f, lft.popped_front(), rgt.popped_front()));
+    });
+}
+
+Stream<int> ints(int n)
+{
+    return Stream<int>([=]()
+    {
+        return Cell<int>(n, ints(n + 1));
+    });
+}
+
 template<class T, class F>
 void forEach(Stream<T> strm, F f)
 {
@@ -171,7 +183,7 @@ class Queue
 public:
     Queue() : _lenF(0), _lenR(0) {}
     Queue(int lf, Stream<T> f, int lr, Stream<T> r)
-        : _lenF(lf), _front(f), _lenR(lr), _rear(r)
+        : _lenF(lf), _front(std::move(f)), _lenR(lr), _rear(std::move(r))
     {}
     bool isEmpty() const { return _lenF == 0; }
     Queue pushed_back(T x) const
