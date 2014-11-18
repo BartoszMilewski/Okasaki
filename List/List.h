@@ -1,3 +1,6 @@
+#if ! defined(LIST_H)
+#define LIST_H
+
 #include <cassert>
 #include <memory>
 #include <functional>
@@ -12,7 +15,9 @@ class List
 {
     struct Item
     {
-        Item(T v, std::shared_ptr<const Item> const & tail) : _val(v), _next(tail) {}
+        Item(T v, std::shared_ptr<const Item> tail) 
+            : _val(v), _next(std::move(tail)) 
+        {}
         // singleton
         explicit Item(T v) : _val(v) {}
         //~Item() { std::cout << "~" << _val << std::endl; }
@@ -20,20 +25,14 @@ class List
         std::shared_ptr<const Item> _next;
     };
     friend Item;
-    explicit List(std::shared_ptr<const Item> const & items) : _head(items) {}
+    explicit List(std::shared_ptr<const Item> items) 
+        : _head(std::move(items)) {}
 public:
     // Empty list
     List() {}
-    List(List && lst)
-        : _head(std::move(lst._head))
-    {}
-    List & operator=(List && lst)
-    {
-        _head = std::move(lst._head);
-        return *this;
-    }
-    // Cons
-    List(T v, List const & tail) : _head(std::make_shared<Item>(v, tail._head)) {}
+   // Cons
+    List(T v, List const & tail) 
+        : _head(std::make_shared<Item>(v, tail._head)) {}
     // Singleton
     explicit List(T v) : _head(std::make_shared<Item>(v)) {}
     // From initializer list
@@ -180,7 +179,6 @@ namespace std
     }
 }
 
-
 template<class T>
 List<T> concat(List<T> const & a, List<T> const & b)
 {
@@ -237,7 +235,7 @@ U foldl(F f, U acc, List<T> lst)
 
 // Set difference a \ b
 template<class T>
-List<T> diff(List<T> const & as, List<T> const & bs)
+List<T> set_diff(List<T> const & as, List<T> const & bs)
 {
     return foldl([](List<T> const & acc, T x) {
         return acc.removed(x);
@@ -247,7 +245,7 @@ List<T> diff(List<T> const & as, List<T> const & bs)
 // Set union of two lists, xs u ys
 // Assume no duplicates inside either list
 template<class T>
-List<T> unionized(List<T> const & xs, List<T> const & ys)
+List<T> set_union(List<T> const & xs, List<T> const & ys)
 {
     // xs u ys = (ys \ xs) ++ xs
     // removed all xs from ys
@@ -327,3 +325,5 @@ List<T> reversed(List<T> const & lst)
         return List<T>(v, acc);
     }, List<T>(), lst);
 }
+
+#endif

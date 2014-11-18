@@ -1,3 +1,4 @@
+#include "../List/List.h"
 #include <cassert>
 #include <memory>
 
@@ -221,5 +222,18 @@ RBTree<T> treeUnion(RBTree<T> const & a, RBTree<T> const & b)
     });
     return res;
 }
+
+// Remove elements in set from a list
+template<class T>
+List<T> rem_from_list(List<T> const & lst, RBTree<T> const & set)
+{
+    List<T> res;
+    lst.forEach([&res, &set](T const & v) {
+        if (!set.member(v))
+            res = res.pushed_front(v);
+    });
+    return res;
+}
+
 
 

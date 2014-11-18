@@ -1,42 +1,12 @@
 #include "../List/List.h"
 #include "../PureStream/PureStream.h"
+#include "../Helper/Utils.h"
+#include "../Helper/Futures.h"
 #include <thread>
 #include <future>
 #include <vector>
 #include <algorithm>
 #include <numeric>
-
-template<class T>
-std::future<T> make_ready_future(T val)
-{
-    std::promise<T> promise;
-    promise.set_value(val);
-    return promise.get_future();
-}
-
-template<class T>
-std::vector<T> when_all_vec(std::vector<std::future<T>> & ftrs)
-{
-    std::vector<T> lst;
-    while (!ftrs.empty())
-    {
-        std::future<T> f = std::move(ftrs.back());
-        lst.push_back(f.get());
-        ftrs.pop_back();
-    }
-    return lst;
-}
-
-template<class T>
-std::vector<T> concatAll(std::vector<std::vector<T>> const & in)
-{
-    std::vector<T> res;
-    std::for_each(in.begin(), in.end(), [&res](std::vector<T> const & v){
-        std::copy(v.begin(), v.end(), std::back_inserter(res));
-    });
-    return res;
-}
-
 
 struct Pos
 {
@@ -167,7 +137,7 @@ std::vector<typename Partial::SolutionT> generatePar(int depth, Partial const & 
             futResult.push_back(std::move(futLst));
         });
         std::vector<SolutionVec> all = when_all_vec(futResult);
-        return concatAll(all);
+        return concatAll(std::move(all));
     }
 }
 
