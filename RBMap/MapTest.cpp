@@ -7,9 +7,12 @@
 template <typename T>
 struct ChooseNewest
 {
-	T operator()(const T& oldest, const T& newest) {(void)oldest; return newest;}
+    T operator()(const T& oldest, const T& newest) const
+    {
+        (void)oldest;
+        return newest;
+    }
 };
-
 
 int main()
 {
