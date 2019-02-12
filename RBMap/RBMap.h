@@ -89,7 +89,7 @@ public:
         return RBMap(B, t.left(), t.rootKey(), t.rootValue(), t.right());
     }
     template<class F>
-    RBMap insertedWith(K k, V v, F combine)
+    RBMap insertedWith(K k, V v, F combine) const
     {
         RBMap t = insWith(k, v, combine);
         return RBMap(B, t.left(), t.rootKey(), t.rootValue(), t.right());
