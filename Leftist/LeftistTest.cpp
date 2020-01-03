@@ -9,7 +9,7 @@ void printHeap(Heap<T> const & h)
     else
     {
         std::cout << h.front() << ", ";
-        printHeap(h.pop_front());
+        printHeap(h.popped_front());
     }
 }
 
@@ -25,7 +25,7 @@ void main()
     printHeap(h);
     Heap<int> h1(100);
     printHeap(h1);
-    Heap<int> h2 = h1.insert(102);
+    Heap<int> h2 = h1.inserted(102);
     printHeap(h2);
     testInit();
 }

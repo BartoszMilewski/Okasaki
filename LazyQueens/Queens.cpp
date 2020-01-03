@@ -1,45 +1,12 @@
 #include "../List/List.h"
 #include "../PureStream/PureStream.h"
+#include "../Helper/Utils.h"
+#include "../Helper/Futures.h"
 #include <thread>
 #include <future>
 #include <vector>
 #include <algorithm>
 #include <numeric>
-
-template<class T>
-std::future<T> make_ready_future(T val)
-{
-    std::promise<T> promise;
-    promise.set_value(val);
-    return promise.get_future();
-}
-
-template<class T>
-std::vector<T> when_all_vec(std::vector<std::future<T>> & ftrs)
-{
-    std::vector<T> lst;
-    while (!ftrs.empty())
-    {
-        std::future<T> f = std::move(ftrs.back());
-        lst.push_back(f.get());
-        ftrs.pop_back();
-    }
-    return lst;
-}
-
-template<class T>
-std::vector<T> concatAll(std::vector<std::vector<T>> const & in)
-{
-    unsigned total = std::accumulate(in.begin(), in.end(), 0u,
-        [](unsigned sum, std::vector<T> const & v) { return sum + v.size(); });
-    std::vector<T> res;
-    res.reserve(total);
-    std::for_each(in.begin(), in.end(), [&res](std::vector<T> const & v){
-        std::copy(v.begin(), v.end(), std::back_inserter(res));
-    });
-    return res;
-}
-
 
 struct Pos
 {
@@ -107,7 +74,7 @@ Stream<PartSol> PartSol::refineRow(int col, int dim) const
         return Stream<PartSol>();
     return Stream<PartSol>([this, col, dim]() -> Cell<PartSol>
     {
-        PartSol part(_curRow + 1, _queens.push_front(Pos(col, _curRow)));
+        PartSol part(_curRow + 1, _queens.pushed_front(Pos(col, _curRow)));
         Stream<PartSol> tail = refineRow(col + 1, dim);
         return Cell<PartSol>(part, tail);
     });
@@ -136,7 +103,6 @@ std::vector<typename Partial::SolutionT> generate(Partial const & part, Constrai
         SolutionVec result;
         forEach(std::move(partList), [&](Partial const & part){
             SolutionVec lst = generate(part, constr);
-            result.reserve(result.size() + lst.size());
             std::copy(lst.begin(), lst.end(), std::back_inserter(result));
         });
         return result;
@@ -171,7 +137,7 @@ std::vector<typename Partial::SolutionT> generatePar(int depth, Partial const & 
             futResult.push_back(std::move(futLst));
         });
         std::vector<SolutionVec> all = when_all_vec(futResult);
-        return concatAll(all);
+        return concatAll(std::move(all));
     }
 }
 

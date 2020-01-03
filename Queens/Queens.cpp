@@ -1,17 +1,10 @@
 #include "../List/List.h"
+#include "../Helper/Utils.h"
 #include <thread>
 #include <future>
 #include <vector>
 #include <algorithm>
 #include <numeric>
-
-template<class T>
-std::future<T> make_ready_future(T val)
-{
-    std::promise<T> promise;
-    promise.set_value(val);
-    return promise.get_future();
-}
 
 template<class T>
 std::vector<T> when_all_vec(std::vector<std::future<T>> & ftrs)
@@ -25,20 +18,6 @@ std::vector<T> when_all_vec(std::vector<std::future<T>> & ftrs)
     }
     return lst;
 }
-
-template<class T>
-std::vector<T> concatAll(std::vector<std::vector<T>> const & in)
-{
-    unsigned total = std::accumulate(in.begin(), in.end(), 0u,
-        [](unsigned sum, std::vector<T> const & v) { return sum + v.size(); });
-    std::vector<T> res;
-    res.reserve(total);
-    std::for_each(in.begin(), in.end(), [&res](std::vector<T> const & v){
-        std::copy(v.begin(), v.end(), std::back_inserter(res));
-    });
-    return res;
-}
-
 
 struct Pos
 {
@@ -87,6 +66,7 @@ bool isConflict(Pos const & p, Pos const & q)
     return p.col == q.col || p.row == q.row || abs(p.col - q.col) == abs(p.row - q.row);
 }
 
+/*
 bool PartSol::isAllowed(Pos const & pos) const
 {
     for (auto it = std::begin(_queens); it != std::end(_queens); ++it)
@@ -96,6 +76,12 @@ bool PartSol::isAllowed(Pos const & pos) const
     }
     return true;
 }
+*/
+
+bool PartSol::isAllowed(Pos const & pos) const
+{
+    return all(_queens, [&pos](Pos const & q){ return !isConflict(q, pos); });
+}
 
 List<PartSol> PartSol::refine(int dim) const
 {
@@ -103,7 +89,7 @@ List<PartSol> PartSol::refine(int dim) const
     for (int col = 0; col < dim; ++col)
     {
         if (isAllowed(Pos(col, _curRow)))
-            parts = parts.push_front(PartSol(_curRow + 1,  _queens.push_front(Pos(col, _curRow))));
+            parts = parts.pushed_front(PartSol(_curRow + 1,  _queens.pushed_front(Pos(col, _curRow))));
     }
     return parts;
 }
@@ -126,7 +112,6 @@ std::vector<typename Partial::SolutionT> generate(Partial const & part, Constrai
         SolutionVec result;
         forEach(std::move(partList), [&](Partial const & part){
             SolutionVec lst = generate(part, constr);
-            result.reserve(result.size() + lst.size());
             std::copy(lst.begin(), lst.end(), std::back_inserter(result));
         });
         return result;
@@ -161,7 +146,7 @@ std::vector<typename Partial::SolutionT> generatePar(int depth, Partial const & 
             futResult.push_back(std::move(futLst));
         });
         std::vector<SolutionVec> all = when_all_vec(futResult);
-        return concatAll(all);
+        return concatAll(std::move(all));
     }
 }
 

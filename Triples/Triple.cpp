@@ -31,7 +31,7 @@ auto fmap(Stream<T> stm, F f)->Stream<decltype(f(stm.get()))>
     if (stm.isEmpty()) return Stream<U>();
     return Stream<U>([stm, f]()
     {
-        return Cell<U>(f(stm.get()), fmap(stm.pop_front(), f));
+        return Cell<U>(f(stm.get()), fmap(stm.popped_front(), f));
     });
 }
 
@@ -45,7 +45,7 @@ auto fmapv(Stream<T> stm, F f)->Stream<decltype(f())>
     if (stm.isEmpty()) return Stream<U>();
     return Stream<U>([stm, f]()
     {
-        return Cell<U>(f(), fmapv(stm.pop_front(), f));
+        return Cell<U>(f(), fmapv(stm.popped_front(), f));
     });
 }
 
@@ -63,13 +63,13 @@ Stream<T> mjoin(Stream<Stream<T>> stm)
 {
     while (!stm.isEmpty() && stm.get().isEmpty())
     {
-        stm = stm.pop_front();
+        stm = stm.popped_front();
     }
     if (stm.isEmpty()) return Stream<T>();
     return Stream<T>([stm]()
     {
         Stream<T> hd = stm.get();
-        return Cell<T>(hd.get(), concat(hd.pop_front(), mjoin(stm.pop_front())));
+        return Cell<T>(hd.get(), concat(hd.popped_front(), mjoin(stm.popped_front())));
     });
 }
 

@@ -76,7 +76,7 @@ public:
         else
         {
             Iter mid = b + (e - b) / 2;
-            return merge(heapify(b, mid), heapify(mid, e));
+            return merged(heapify(b, mid), heapify(mid, e));
         }
     }
     bool isEmpty() const { return !_tree; }
@@ -86,24 +86,24 @@ public:
         else return _tree->_rank;
     }
     T front() const { return _tree->_v; }
-    Heap pop_front() const 
+    Heap popped_front() const 
     {
-        return merge(left(), right()); 
+        return merged(left(), right()); 
     }
-    Heap insert(T x)
+    Heap inserted(T x)
     {
-        return merge(Heap(x), *this);
+        return merged(Heap(x), *this);
     }
-    // merge along right spines: log time
-    static Heap merge(Heap const & h1, Heap const & h2)
+    // merged along right spines: log time
+    static Heap merged(Heap const & h1, Heap const & h2)
     {
         if (h1.isEmpty())
             return h2;
         if (h2.isEmpty())
             return h1;
         if (h1.front() <= h2.front())
-            return Heap(h1.front(), h1.left(), merge(h1.right(), h2));
+            return Heap(h1.front(), h1.left(), merged(h1.right(), h2));
         else
-            return Heap(h2.front(), h2.left(), merge(h1, h2.right()));
+            return Heap(h2.front(), h2.left(), merged(h1, h2.right()));
     }
 };
